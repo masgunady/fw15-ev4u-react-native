@@ -2,7 +2,12 @@ import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
 import {IMGSplash} from '../../assets';
 
-const SplashScreen = () => {
+const SplashScreen = ({navigation}) => {
+  React.useEffect(() => {
+    setTimeout(() => {
+      navigation.replace('SignIn');
+    }, 2000);
+  }, [navigation]);
   return (
     <View style={style.container}>
       <View>
@@ -20,20 +25,19 @@ const style = StyleSheet.create({
     backgroundColor: '#4c3f91',
     flex: 1,
     gap: 30,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 150,
   },
   titleApp: {
     maxWidth: 380,
     fontSize: 48,
-    fontWeight: '600',
     letterSpacing: 2,
     textAlign: 'center',
     color: '#FFF',
-    fontFamily: 'Poppins',
+    fontFamily: 'Poppins-SemiBold',
   },
   imgContainer: {
-    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
