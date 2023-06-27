@@ -6,7 +6,7 @@ const SplashScreen = ({navigation}) => {
   React.useEffect(() => {
     setTimeout(() => {
       navigation.replace('SignIn');
-    }, 2000);
+    }, 3000);
   }, [navigation]);
   return (
     <View style={style.container}>
