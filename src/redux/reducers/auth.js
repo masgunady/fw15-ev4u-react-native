@@ -1,4 +1,4 @@
-import {asyncLogin} from '../actions/auth';
+import {asyncLogin, asyncRegister} from '../actions/auth';
 
 const {createSlice} = require('@reduxjs/toolkit');
 
@@ -33,13 +33,20 @@ const auth = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(asyncLogin.fulfilled, (state, action) => {
-      state.token = action.payload;
-    });
     builder.addCase(asyncLogin.pending, state => {
       state.errorMessage = '';
     });
+    builder.addCase(asyncLogin.fulfilled, (state, action) => {
+      state.token = action.payload;
+    });
     builder.addCase(asyncLogin.rejected, (state, action) => {
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(asyncRegister.fulfilled, (state, action) => {
+      // state.token = action.payload;
+      state.successMessage = action.payload;
+    });
+    builder.addCase(asyncRegister.rejected, (state, action) => {
       state.errorMessage = action.payload;
     });
   },

@@ -21,3 +21,28 @@ export const asyncLogin = createAsyncThunk(
     }
   },
 );
+export const asyncRegister = createAsyncThunk(
+  'asyncRegister',
+  async (payload, {rejectWithValue}) => {
+    try {
+      const form = new URLSearchParams();
+
+      form.append('fullName', payload.fullName);
+      form.append('email', payload.email);
+      form.append('password', payload.password);
+      form.append('confirmPassword', payload.confirmPassword);
+      form.append('termAndCondition', payload.termAndCondition);
+
+      const {data} = await http().post('/auth/register', form.toString());
+      // return data.results.token;
+      return data.message;
+    } catch (err) {
+      const message = err?.response?.data?.message;
+      if (message) {
+        return rejectWithValue(message);
+      } else {
+        return rejectWithValue(err.message);
+      }
+    }
+  },
+);
