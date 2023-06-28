@@ -6,10 +6,44 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React from 'react';
-import {Button, Input} from '../../components/elements';
+import {Button, Input, Checkbox, Alert} from '../../components/elements';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+import {asyncRegister} from '../../redux/actions/auth';
+import {useDispatch, useSelector} from 'react-redux';
+import {clearMessage} from '../../redux/reducers/auth';
+
+const validationSchema = Yup.object({
+  fullName: Yup.string()
+    .required('Full name is Required!')
+    .min(3, 'Please insert valid full name'),
+  email: Yup.string().required('Email is Required!').email('Email is invalid!'),
+  password: Yup.string().required('Password is Required'),
+  confirmPassword: Yup.string()
+    .required('Confirm password is Required')
+    .oneOf([Yup.ref('password'), null], 'Password must match'),
+  termAndCondition: Yup.boolean().oneOf(
+    [true],
+    'You must accept the terms and conditions',
+  ),
+});
 
 const Register = ({navigation}) => {
+  const dispatch = useDispatch();
+  const successMessage = useSelector(state => state.auth.successMessage);
+  const errorMessage = useSelector(state => state.auth.errorMessage);
+  const doRegister = values => {
+    dispatch(asyncRegister(values));
+  };
+
+  if (successMessage) {
+    setTimeout(() => {
+      dispatch(clearMessage());
+      navigation.replace('SignIn');
+    }, 1500);
+  }
+  // const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
   return (
     <ScrollView style={style.container}>
       <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
@@ -24,20 +58,88 @@ const Register = ({navigation}) => {
             <Text style={style.textSubLoginBtn}> Sign In</Text>
           </TouchableOpacity>
         </View>
+        {successMessage && <Alert variant="success">{successMessage}</Alert>}
+        {errorMessage && <Alert variant="error">{errorMessage}</Alert>}
       </View>
-      <View style={style.formInput}>
-        <Input placeholder="Enter your fullname" />
-        <Input placeholder="Enter your email" keyboardType="email-address" />
-        <Input placeholder="Enter your password" password />
-        <Input placeholder="Re-Enter your password" password />
-        <View style={{marginBottom: 3}} />
-        <View style={style.sectionToSignup}>
-          <Text>Accept terms and condition</Text>
-        </View>
-        <View style={{marginBottom: 3}} />
+      <Formik
+        initialValues={{
+          fullName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          termAndCondition: false,
+        }}
+        validationSchema={validationSchema}
+        onSubmit={doRegister}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          setFieldValue,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View style={style.formInput}>
+            <Input
+              onChangeText={handleChange('fullName')}
+              onBlur={handleBlur('fullName')}
+              value={values.fullName}
+              placeholder="Enter your fullname"
+            />
+            {errors.fullName && touched.fullName && (
+              <Text style={style.errorsText}>{errors.fullName}</Text>
+            )}
+            <Input
+              onChangeText={handleChange('email')}
+              onBlur={handleBlur('email')}
+              value={values.email}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+            />
+            {errors.email && touched.email && (
+              <Text style={style.errorsText}>{errors.email}</Text>
+            )}
+            <Input
+              onChangeText={handleChange('password')}
+              onBlur={handleBlur('password')}
+              value={values.password}
+              placeholder="Enter your password"
+              password
+            />
+            {errors.password && touched.password && (
+              <Text style={style.errorsText}>{errors.password}</Text>
+            )}
+            <Input
+              onChangeText={handleChange('confirmPassword')}
+              onBlur={handleBlur('confirmPassword')}
+              value={values.confirmPassword}
+              placeholder="Re-Enter your password"
+              password
+            />
+            {errors.confirmPassword && touched.confirmPassword && (
+              <Text style={style.errorsText}>{errors.confirmPassword}</Text>
+            )}
+            <View style={{marginBottom: 3}} />
+            <View style={style.sectionToSignup}>
+              <Checkbox
+                disabled={false}
+                value={values.termAndCondition}
+                onValueChange={value =>
+                  setFieldValue('termAndCondition', value)
+                }
+              />
+              <Text>Accept terms and condition</Text>
+            </View>
+            {errors.termAndCondition && touched.termAndCondition && (
+              <Text style={style.errorsText}>{errors.termAndCondition}</Text>
+            )}
+            <View style={{marginBottom: 3}} />
 
-        <Button btnTitle="Sign Up" />
-      </View>
+            <Button onPress={handleSubmit} btnTitle="Sign Up" />
+          </View>
+        )}
+      </Formik>
     </ScrollView>
   );
 };
@@ -77,6 +179,9 @@ const style = StyleSheet.create({
   },
   formInput: {
     gap: 15,
+  },
+  errorsText: {
+    color: '#FF9191',
   },
 });
 
