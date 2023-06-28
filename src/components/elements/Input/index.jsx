@@ -8,7 +8,7 @@ import {
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const Input = ({password, ...props}) => {
+const Input = ({password, ...rest}) => {
   const [hidePassword, setHidePassword] = React.useState(password);
   const handleInputPass = () => {
     setHidePassword(!hidePassword);
@@ -16,7 +16,7 @@ const Input = ({password, ...props}) => {
   return (
     <View style={style.container}>
       <View style={style.inputContainer}>
-        <TextInput secureTextEntry={hidePassword} {...props} />
+        <TextInput secureTextEntry={hidePassword} {...rest} />
       </View>
       {password && (
         <TouchableOpacity onPress={handleInputPass} style={style.iconShowHide}>

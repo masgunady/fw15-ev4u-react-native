@@ -1,13 +1,22 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
 import {IMGSplash} from '../../assets';
+import {useSelector} from 'react-redux';
 
 const SplashScreen = ({navigation}) => {
+  const token = useSelector(state => state.auth.token);
+
   React.useEffect(() => {
-    setTimeout(() => {
-      navigation.replace('SignIn');
-    }, 3000);
-  }, [navigation]);
+    if (token) {
+      setTimeout(() => {
+        navigation.replace('Home');
+      }, 1500);
+    } else {
+      setTimeout(() => {
+        navigation.replace('SignIn');
+      }, 1500);
+    }
+  }, [navigation, token]);
   return (
     <View style={style.container}>
       <View>
