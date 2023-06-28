@@ -1,3 +1,4 @@
 import Input from './Input';
 import Button from './Button';
-export {Input, Button};
+import Alert from './Alert';
+export {Input, Button, Alert};

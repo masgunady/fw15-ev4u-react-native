@@ -6,10 +6,32 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React from 'react';
-import {Button, Input} from '../../components/elements';
+import {Button, Input, Alert} from '../../components/elements';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {useDispatch, useSelector} from 'react-redux';
+import {asyncLogin} from '../../redux/actions/auth';
+import {clearMessage} from '../../redux/reducers/auth';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email('Please enter the valid email')
+    .required('Email is required'),
+  password: Yup.string().required('Password is required'),
+});
 
 const SignIn = ({navigation}) => {
+  const dispatch = useDispatch();
+  const errorMessage = useSelector(state => state.auth.errorMessage);
+  const doLogin = values => {
+    dispatch(asyncLogin(values));
+  };
+  if (errorMessage) {
+    setTimeout(() => {
+      dispatch(clearMessage());
+    }, 5000);
+  }
   return (
     <ScrollView style={style.container}>
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -23,16 +45,54 @@ const SignIn = ({navigation}) => {
           <Text style={style.textSubLogin}>
             Hi, Welcome back to Urticket ..
           </Text>
+          {errorMessage && <Alert variant="error">{errorMessage}</Alert>}
         </View>
-        <View style={style.formInput}>
-          <Input placeholder="Enter your email" keyboardType="email-address" />
-          <Input placeholder="Enter your password" password />
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ForgotPassword')}>
-            <Text style={style.forgotPassText}>Forgot Password ?</Text>
-          </TouchableOpacity>
-          <Button btnTitle="Login" />
-        </View>
+        <Formik
+          initialValues={{email: '', password: ''}}
+          validationSchema={validationSchema}
+          onSubmit={doLogin}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <View style={style.formInput}>
+              <Input
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+              />
+              {errors.email && touched.email && (
+                <Text style={style.errorsText}>{errors.email}</Text>
+              )}
+              <Input
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                placeholder="Enter your password"
+                password
+              />
+              {errors.password && touched.password && (
+                <Text style={style.errorsText}>{errors.password}</Text>
+              )}
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ForgotPassword')}>
+                <Text style={style.forgotPassText}>Forgot Password ?</Text>
+              </TouchableOpacity>
+              <Button
+                disabled={!touched.email && !touched.password}
+                onPress={handleSubmit}
+                btnTitle="Login"
+              />
+            </View>
+          )}
+        </Formik>
         <View style={{marginBottom: 15}} />
         <View style={style.sectionToSignup}>
           <Text style={style.textSubLogin}>Don't have account ?</Text>
@@ -121,6 +181,9 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#373A42',
     borderRadius: 5,
+  },
+  errorsText: {
+    color: '#FF9191',
   },
 });
 
