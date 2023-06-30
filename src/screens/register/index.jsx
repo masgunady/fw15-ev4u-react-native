@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import React from 'react';
 import {Button, Input, Checkbox, Alert} from '../../components/elements';
@@ -46,6 +47,11 @@ const Register = ({navigation}) => {
   // const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
   return (
     <ScrollView style={style.container}>
+      <StatusBar
+        barStyle="dark-content"
+        translucent={true}
+        backgroundColor="transparent"
+      />
       <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
         <Icon name="arrow-left" size={25} color="#373A42" />
       </TouchableOpacity>
@@ -147,7 +153,8 @@ const Register = ({navigation}) => {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 30,
+    paddingTop: 50,
+    paddingHorizontal: 30,
   },
   wrappTitle: {
     width: '100%',

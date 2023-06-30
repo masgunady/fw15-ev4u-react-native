@@ -5,6 +5,7 @@ import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
 import Home from './Home';
 import Profile from './Profile';
+import DetailEvent from './DetailEvent';
 
 export {
   SplashScreen,
@@ -14,4 +15,5 @@ export {
   ResetPassword,
   Home,
   Profile,
+  DetailEvent,
 };

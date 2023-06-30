@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import React from 'react';
 import {Button, Input, Alert} from '../../components/elements';
@@ -34,6 +35,11 @@ const SignIn = ({navigation}) => {
   }
   return (
     <ScrollView style={style.container}>
+      <StatusBar
+        barStyle="dark-content"
+        translucent={true}
+        backgroundColor="transparent"
+      />
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Icon name="arrow-left" size={25} color="#373A42" />
       </TouchableOpacity>
@@ -122,7 +128,8 @@ const SignIn = ({navigation}) => {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 30,
+    paddingTop: 50,
+    paddingHorizontal: 30,
   },
   wrappTitle: {
     width: '100%',

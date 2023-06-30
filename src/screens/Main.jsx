@@ -7,6 +7,7 @@ import {
   ResetPassword,
   Home,
   Profile,
+  DetailEvent,
 } from './index';
 
 import {NavigationContainer} from '@react-navigation/native';
@@ -57,7 +58,7 @@ function MyDrawer() {
       <Drawer.Screen
         name="SplashScreen"
         component={SplashScreen}
-        options={{drawerLabel: () => null}}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
       <Drawer.Screen
         name="Home"
@@ -78,6 +79,11 @@ function MyDrawer() {
           ),
           drawerLabel: 'Profile',
         }}
+      />
+      <Drawer.Screen
+        name="DetailEvent"
+        component={DetailEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
     </Drawer.Navigator>
   );
