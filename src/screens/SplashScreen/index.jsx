@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, StatusBar} from 'react-native';
 import React from 'react';
 import {IMGSplash} from '../../assets';
 import {useSelector} from 'react-redux';
@@ -19,6 +19,7 @@ const SplashScreen = ({navigation}) => {
   }, [navigation, token]);
   return (
     <View style={style.container}>
+      <StatusBar translucent={true} backgroundColor="transparent" />
       <View>
         <Text style={style.titleApp}>Find Events You Love</Text>
       </View>
