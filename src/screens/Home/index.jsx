@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
+  BackHandler,
 } from 'react-native';
 import React from 'react';
 
@@ -26,6 +27,12 @@ const Home = () => {
     getEvent();
   }, []);
   const uniqueDates = [...new Set(events.map(item => item?.date))];
+  React.useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => {
+      BackHandler.addEventListener('hardwareBackPress', () => true);
+    };
+  }, []);
   return (
     <View style={style.wrapper}>
       <StatusBar translucent={true} backgroundColor="transparent" />
@@ -79,7 +86,7 @@ const Home = () => {
           <Text>See all</Text>
         </View>
         <View style={style.monthTextCont}>
-          <Text style={style.monthText}>SEP</Text>
+          <Text style={style.monthText}>OCT</Text>
         </View>
         <View>
           {uniqueDates.map(date => {

@@ -34,6 +34,7 @@ const Register = ({navigation}) => {
   const dispatch = useDispatch();
   const successMessage = useSelector(state => state.auth.successMessage);
   const errorMessage = useSelector(state => state.auth.errorMessage);
+
   const doRegister = values => {
     dispatch(asyncRegister(values));
   };

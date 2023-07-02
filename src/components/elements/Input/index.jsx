@@ -33,7 +33,7 @@ const Input = ({password, ...rest}) => {
 const style = StyleSheet.create({
   inputContainer: {
     borderRadius: 15,
-    height: 55,
+    height: 60,
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#C1C5D0',

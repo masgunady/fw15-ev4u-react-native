@@ -7,10 +7,51 @@ import {
   StatusBar,
 } from 'react-native';
 import React from 'react';
-import {Button, Input} from '../../components/elements';
+import {Alert, Button, Input} from '../../components/elements';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import http from '../../helpers/http';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object({
+  code: Yup.number().required('Code is required').positive().integer(),
+  email: Yup.string().required('Email is Required!').email('Email is invalid!'),
+  password: Yup.string().required('Password is Required'),
+  confirmPassword: Yup.string().required('Confirm Password is Required'),
+});
 
 const ResetPassword = ({navigation}) => {
+  const [successMessage, setSuccessMessage] = React.useState('');
+  const [errorMessage, setErrorMessage] = React.useState('');
+
+  const doReset = async values => {
+    try {
+      const form = new URLSearchParams();
+      form.append('code', values.code);
+      form.append('email', values.email);
+      form.append('password', values.password);
+      form.append('confirmPassword', values.confirmPassword);
+      const {data} = await http().post('/auth/resetPassword', form.toString());
+      if (data?.message) {
+        setSuccessMessage(data?.message);
+        setTimeout(() => navigation.replace('SignIn'), 2000);
+      }
+      // console.log(form.toString());
+    } catch (error) {
+      const errorMsg = error?.response?.data?.message;
+      if (errorMsg) {
+        setErrorMessage(errorMsg);
+      }
+    }
+  };
+
+  if (successMessage) {
+    setTimeout(() => setSuccessMessage(''), 1500);
+  }
+  if (errorMessage) {
+    setTimeout(() => setErrorMessage(''), 2500);
+  }
+
   return (
     <ScrollView style={style.container}>
       <StatusBar
@@ -29,13 +70,74 @@ const ResetPassword = ({navigation}) => {
             You'll get mail soon on your email
           </Text>
         </View>
-        <View style={style.formInput}>
-          <Input placeholder="Enter your reset code" />
-          <Input placeholder="Enter your email" keyboardType="email-address" />
-          <Input placeholder="Enter your password" password />
-          <Input placeholder="Re-Enter your password" password />
-          <Button btnTitle="Reset" />
-        </View>
+
+        <Formik
+          initialValues={{
+            code: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={doReset}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <View style={style.formInput}>
+              {successMessage && (
+                <Alert variant="success">{successMessage}</Alert>
+              )}
+              {errorMessage && <Alert variant="error">{errorMessage}</Alert>}
+
+              <Input
+                onChangeText={handleChange('code')}
+                onBlur={handleBlur('code')}
+                value={values.code}
+                placeholder="Enter your reset code"
+                keyboardType="numeric"
+              />
+              {errors.code && touched.code && (
+                <Text style={style.errorsText}>{errors.code}</Text>
+              )}
+              <Input
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+              />
+              {errors.email && touched.email && (
+                <Text style={style.errorsText}>{errors.email}</Text>
+              )}
+              <Input
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                placeholder="Enter your password"
+                password
+              />
+              {errors.password && touched.password && (
+                <Text style={style.errorsText}>{errors.password}</Text>
+              )}
+              <Input
+                onChangeText={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
+                value={values.confirmPassword}
+                placeholder="Re-Enter your password"
+                password
+              />
+              {errors.confirmPassword && touched.confirmPassword && (
+                <Text style={style.errorsText}>{errors.confirmPassword}</Text>
+              )}
+              <Button onPress={handleSubmit} btnTitle="Reset" />
+            </View>
+          )}
+        </Formik>
       </View>
     </ScrollView>
   );
@@ -104,6 +206,9 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#373A42',
     borderRadius: 5,
+  },
+  errorsText: {
+    color: '#FF9191',
   },
 });
 
