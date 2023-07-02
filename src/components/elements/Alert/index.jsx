@@ -30,9 +30,9 @@ const Alert = ({variant, children}) => {
 const style = StyleSheet.create({
   errorWrapper: {
     backgroundColor: '#FF9191',
-    paddingLeft: 15,
+    padding: 15,
     borderRadius: 15,
-    height: 55,
+    minHeight: 55,
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',

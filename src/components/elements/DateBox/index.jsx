@@ -15,7 +15,7 @@ const DateBox = ({dates, days}) => {
 const style = StyleSheet.create({
   upcomingTextCont: {
     width: 60,
-    height: 85,
+    height: 75,
     backgroundColor: 'white',
     shadowColor: 'black',
     shadowOffset: {width: 0, height: 3},

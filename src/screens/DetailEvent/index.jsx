@@ -16,11 +16,11 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {useSelector} from 'react-redux';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useFocusEffect} from '@react-navigation/native';
 
 const DetailEvent = ({route, navigation}) => {
   const {id} = route.params;
   const token = useSelector(state => state.auth.token);
-
   const [eventDetail, setEventDetail] = React.useState({});
   const [wishlistButton, setWishlistButton] = React.useState(false);
 
@@ -34,38 +34,24 @@ const DetailEvent = ({route, navigation}) => {
     }
   }, [id]);
 
-  React.useEffect(() => {
-    const eventId = {eventId: id};
-    const qString = new URLSearchParams(eventId).toString();
-    const checkWishlist = async () => {
-      const {data} = await http(token).get(`/wishlist/check?${qString}`);
-      console.log(data.results);
-      const btnStatus = data.results;
-      if (btnStatus) {
-        setWishlistButton(true);
-      }
-    };
-    updateStateWishlists();
-    checkWishlist();
-  }, [id, token]);
+  useFocusEffect(
+    React.useCallback(() => {
+      const eventId = {eventId: id};
+      const qString = new URLSearchParams(eventId).toString();
+      const fetchData = async () => {
+        const {data} = await http(token).get(`/wishlist/check?${qString}`);
+        const btnStatus = data.results;
+        if (btnStatus) {
+          setWishlistButton(true);
+        } else {
+          setWishlistButton(false);
+        }
+      };
+      fetchData();
+    }, [token, id]),
+  );
 
-  const updateStateWishlists = () => {
-    const eventId = {eventId: id};
-    const qString = new URLSearchParams(eventId).toString();
-    const checkBookmarks = async () => {
-      const {data} = await http(token).get(`/wishlist/check?${qString}`);
-      const btnStatus = data.results;
-      if (btnStatus) {
-        setWishlistButton(true);
-      } else {
-        setWishlistButton();
-      }
-    };
-    checkBookmarks();
-  };
-
-  const addRemoveWishlist = async event => {
-    event.preventDefault();
+  const addRemoveWishlist = async () => {
     try {
       const eventId = {eventId: id};
       const qString = new URLSearchParams(eventId).toString();
@@ -83,6 +69,61 @@ const DetailEvent = ({route, navigation}) => {
       }
     }
   };
+
+  const handlePressEvent = eventId => {
+    navigation.navigate('Booking', {eventId});
+  };
+
+  // React.useEffect(() => {
+  //   const eventId = {eventId: id};
+  //   const qString = new URLSearchParams(eventId).toString();
+  //   const checkWishlist = async () => {
+  //     const {data} = await http(token).get(`/wishlist/check?${qString}`);
+  //     console.log(data.results);
+  //     const btnStatus = data.results;
+  //     if (btnStatus) {
+  //       setWishlistButton(true);
+  //     }
+  //   };
+  //   updateStateWishlists();
+  //   checkWishlist();
+  // }, [id, token]);
+
+  // const updateStateWishlists = () => {
+  //   const eventId = {eventId: id};
+  //   const qString = new URLSearchParams(eventId).toString();
+  //   const checkBookmarks = async () => {
+  //     const {data} = await http(token).get(`/wishlist/check?${qString}`);
+  //     const btnStatus = data.results;
+  //     if (btnStatus) {
+  //       setWishlistButton(true);
+  //     } else {
+  //       setWishlistButton();
+  //     }
+  //   };
+  //   checkBookmarks();
+  // };
+
+  // const addRemoveWishlist = async event => {
+  //   event.preventDefault();
+  //   try {
+  //     const eventId = {eventId: id};
+  //     const qString = new URLSearchParams(eventId).toString();
+  //     const {data} = await http(token).post('/wishlist', qString);
+  //     console.log(data);
+  //     if (wishlistButton) {
+  //       setWishlistButton(false);
+  //     } else {
+  //       setWishlistButton(true);
+  //     }
+  //   } catch (err) {
+  //     const message = err?.response?.data?.message;
+  //     if (message) {
+  //       console.log(message);
+  //     }
+  //   }
+  // };
+
   return (
     <View style={style.container}>
       <StatusBar translucent={true} backgroundColor="transparent" />
@@ -153,11 +194,11 @@ const DetailEvent = ({route, navigation}) => {
         <View style={style.containerButton} />
       </ScrollView>
       <View style={style.btnContainer}>
-        <View style={style.touchButton}>
-          <TouchableOpacity>
-            <Text style={style.textTouch}>Buy Tickets</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={style.touchButton}
+          onPress={() => handlePressEvent(eventDetail.id)}>
+          <Text style={style.textTouch}>Buy Tickets</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -219,7 +260,7 @@ const style = StyleSheet.create({
   textEvents: {
     fontSize: 24,
     color: 'black',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   textDetailEvents: {
     fontSize: 16,
@@ -256,7 +297,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
   },
   touchButton: {
-    backgroundColor: 'blue',
+    backgroundColor: '#4c3f91',
     width: '100%',
     height: 55,
     justifyContent: 'center',
@@ -271,7 +312,7 @@ const style = StyleSheet.create({
   textTouch: {
     color: 'white',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   btnContainer: {
     paddingHorizontal: 20,
@@ -281,12 +322,12 @@ const style = StyleSheet.create({
   },
   textOut: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     color: 'white',
   },
   textItem: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     color: 'white',
   },
   IMGMaps: {
