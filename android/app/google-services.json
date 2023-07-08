@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "604840477437",
+    "project_id": "pushnotif-eventapp",
+    "storage_bucket": "pushnotif-eventapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604840477437:android:3295bcc79540c550687494",
+        "android_client_info": {
+          "package_name": "com.appgps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604840477437-qgvi272hjrfn3n5e0suframlei8o7dvb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRpvGXhZvSfMkKW3RpdFB7FlosjXweUho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604840477437-qgvi272hjrfn3n5e0suframlei8o7dvb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -12,12 +12,12 @@ import {IMGProfile} from '../../assets';
 import {useSelector} from 'react-redux';
 import http from '../../helpers/http';
 import {ImageTemplate, Input} from '../../components';
-import Dropdown from 'react-native-input-select';
+// import Dropdown from 'react-native-input-select';
 
 const ProfileEdit = ({navigation}) => {
   const token = useSelector(state => state.auth.token);
   const [profile, setProfile] = React.useState({});
-  const [country, setCountry] = React.useState('Indonesia');
+  // const [country, setCountry] = React.useState('Indonesia');
 
   React.useEffect(() => {
     const getProfile = async () => {
@@ -85,7 +85,7 @@ const ProfileEdit = ({navigation}) => {
             <View style={style.formInput}>
               <Text>Profession</Text>
               <View>
-                <Dropdown
+                {/* <Dropdown
                   placeholder={country}
                   options={[
                     {name: 'Indonesia', code: 'ID'},
@@ -102,13 +102,13 @@ const ProfileEdit = ({navigation}) => {
                     backgroundColor: 'white',
                     borderColor: '#C1C5D0',
                   }}
-                />
+                /> */}
               </View>
             </View>
             <View style={style.formInput}>
               <Text>Nationality</Text>
               <View>
-                <Dropdown
+                {/* <Dropdown
                   placeholder={country}
                   options={[
                     {name: 'Indonesia', code: 'ID'},
@@ -125,7 +125,7 @@ const ProfileEdit = ({navigation}) => {
                     backgroundColor: 'white',
                     borderColor: '#C1C5D0',
                   }}
-                />
+                /> */}
               </View>
             </View>
             <View style={style.formInput}>
