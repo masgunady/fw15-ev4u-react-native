@@ -15,24 +15,37 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {EventBox, CategoryBox, DateBox} from '../../components';
 import http from '../../helpers/http';
+import {useSelector} from 'react-redux';
 
 const Home = () => {
   const navigation = useNavigation();
   const [events, setEvent] = React.useState([]);
+  const token = useSelector(state => state.auth.token);
+  const deviceToken = useSelector(state => state.deviceToken.data);
+
+  const saveToken = React.useCallback(async () => {
+    const form = new URLSearchParams({token: deviceToken.token});
+    await http(token).post('/device-token', form.toString());
+  }, [deviceToken, token]);
+
   React.useEffect(() => {
     async function getEvent() {
       const {data} = await http().get('/event?sort=date&sortBy=asc');
       setEvent(data.results);
     }
+    saveToken();
     getEvent();
-  }, []);
+  }, [saveToken]);
+
   const uniqueDates = [...new Set(events.map(item => item?.date))];
-  React.useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', () => true);
-    return () => {
-      BackHandler.addEventListener('hardwareBackPress', () => true);
-    };
-  }, []);
+
+  // React.useEffect(() => {
+  //   BackHandler.addEventListener('hardwareBackPress', () => true);
+  //   return () => {
+  //     BackHandler.addEventListener('hardwareBackPress', () => true);
+  //   };
+  // }, []);
+
   return (
     <View style={style.wrapper}>
       <StatusBar translucent={true} backgroundColor="transparent" />
