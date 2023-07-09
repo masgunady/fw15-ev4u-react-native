@@ -30,7 +30,7 @@ const Home = () => {
 
   React.useEffect(() => {
     async function getEvent() {
-      const {data} = await http().get('/event?sort=date&sortBy=asc');
+      const {data} = await http().get('/event?sort=id&sortBy=desc');
       setEvent(data.results);
     }
     saveToken();

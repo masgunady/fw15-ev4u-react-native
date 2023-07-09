@@ -5,6 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  Platform,
+  Image,
 } from 'react-native';
 import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -32,7 +34,7 @@ const ProfileEdit = ({navigation}) => {
   const [genderM, setGenderM] = React.useState(false);
   const [genderF, setGenderF] = React.useState(false);
   const [fileResponse, setFileResponse] = React.useState([]);
-
+  const [selectedPicture, setSelectedPicture] = React.useState('');
   const selectProfession = ['Programmer', 'Designer', 'Analyst'];
   const selectNationality = ['Indonesia', 'Malaysia'];
 
@@ -43,6 +45,31 @@ const ProfileEdit = ({navigation}) => {
     };
     getProfile();
   }, [token]);
+
+  const getImage = async source => {
+    let results;
+    if (!source) {
+      results = await launchImageLibrary();
+    } else {
+      results = await launchCamera({
+        quality: 0.5,
+      });
+    }
+    const data = results.assets[0];
+    console.log(data);
+    if (data.uri) {
+      setSelectedPicture({
+        name: data.fileName,
+        type: data.type,
+        uri:
+          Platform.OS === 'android'
+            ? data.uri
+            : data.uri.replace('file://', ''),
+      });
+
+      setFileResponse(data.uri);
+    }
+  };
 
   const doEdit = async values => {
     const form = new FormData();
@@ -81,11 +108,6 @@ const ProfileEdit = ({navigation}) => {
       form.append('gender', 2);
     }
 
-    const getProfile = async () => {
-      const {data} = await http(token).get('/profile');
-      setProfile(data.results);
-    };
-
     try {
       const {data} = await http(token).patch('/profile', form, {
         headers: {
@@ -98,36 +120,17 @@ const ProfileEdit = ({navigation}) => {
       console.warn(err);
     }
 
+    const getProfile = async () => {
+      const {data} = await http(token).get('/profile');
+      setProfile(data.results);
+    };
+
     setEditEmail(false);
     setEditPhone(false);
     setEditGender(false);
     getProfile();
     setFileResponse([]);
   };
-
-  const handleDocumentSelection = React.useCallback(async () => {
-    try {
-      const response = await launchImageLibrary({
-        presentationStyle: 'fullScreen',
-      });
-
-      setFileResponse(response.assets[0].uri);
-    } catch (err) {
-      console.warn(err);
-    }
-  }, []);
-
-  const handleCameraSelection = React.useCallback(async () => {
-    try {
-      const response = await launchCamera({
-        presentationStyle: 'fullScreen',
-      });
-
-      setFileResponse(response.assets[0].uri);
-    } catch (err) {
-      console.warn(err);
-    }
-  }, []);
 
   const handlePressEvent = () => {
     navigation.navigate('Profile');
@@ -163,25 +166,26 @@ const ProfileEdit = ({navigation}) => {
               <View style={style.profileWrapper}>
                 <View style={style.photosContent}>
                   <View style={style.photoIcons}>
-                    <ImageTemplate
-                      src={profile?.picture || null}
-                      defaultImg={IMGProfile}
-                      style={style.IMGProfiles}
-                    />
+                    {selectedPicture ? (
+                      <Image
+                        style={style.fotoProfile}
+                        src={selectedPicture.uri}
+                        width={90}
+                        height={90}
+                      />
+                    ) : (
+                      <ImageTemplate
+                        src={profile?.picture || null}
+                        defaultImg={IMGProfile}
+                        style={style.IMGProfiles}
+                      />
+                    )}
                   </View>
                 </View>
                 <View style={style.textGap20}>
-                  <TouchableOpacity
-                    style={style.btnLoadImg}
-                    onPress={handleDocumentSelection}>
-                    <FeatherIcon name="file-plus" size={25} color="#000" />
-                    {/* <Text>Add</Text> */}
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={style.btnLoadImg}
-                    onPress={handleCameraSelection}>
-                    <FeatherIcon name="camera" size={25} color="#000" />
-                    {/* <Text>Add</Text> */}
+                  <TouchableOpacity onPress={() => getImage()}>
+                    {/* <FeatherIcon name="camera" size={25} color="grey" /> */}
+                    <Text>Choose Picture</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -421,6 +425,11 @@ const ProfileEdit = ({navigation}) => {
 };
 
 const style = StyleSheet.create({
+  fotoProfile: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
   btnLoadImg: {
     display: 'flex',
     justifyContent: 'center',

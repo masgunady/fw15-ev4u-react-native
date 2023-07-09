@@ -24,10 +24,10 @@ const validationSchema = Yup.object({
   confirmPassword: Yup.string()
     .required('Confirm password is Required')
     .oneOf([Yup.ref('password'), null], 'Password must match'),
-  termAndCondition: Yup.boolean().oneOf(
-    [true],
-    'You must accept the terms and conditions',
-  ),
+  // termAndCondition: Yup.boolean().oneOf(
+  //   [true],
+  //   'You must accept the terms and conditions',
+  // ),
 });
 
 const Register = ({navigation}) => {
@@ -38,7 +38,6 @@ const Register = ({navigation}) => {
   const doRegister = values => {
     dispatch(asyncRegister(values));
   };
-
   if (successMessage) {
     setTimeout(() => {
       dispatch(clearMessage());
@@ -74,7 +73,7 @@ const Register = ({navigation}) => {
           email: '',
           password: '',
           confirmPassword: '',
-          termAndCondition: false,
+          termAndCondition: true,
         }}
         validationSchema={validationSchema}
         onSubmit={doRegister}>
@@ -142,7 +141,6 @@ const Register = ({navigation}) => {
               <Text style={style.errorsText}>{errors.termAndCondition}</Text>
             )}
             <View style={{marginBottom: 3}} />
-
             <Button onPress={handleSubmit} btnTitle="Sign Up" />
           </View>
         )}

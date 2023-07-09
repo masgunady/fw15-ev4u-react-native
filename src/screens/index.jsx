@@ -14,6 +14,7 @@ import MyBooking from './MyBooking';
 import MyWishlist from './MyWishlist';
 import ManageEvent from './ManageEvent';
 import DetailTransaction from './MyBooking/DetailTransaction';
+import CreateEvent from './CreateEvent';
 
 export {
   SplashScreen,
@@ -32,4 +33,5 @@ export {
   MyWishlist,
   ManageEvent,
   DetailTransaction,
+  CreateEvent,
 };
