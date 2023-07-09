@@ -10,7 +10,7 @@ import React from 'react';
 import http from '../../helpers/http';
 import {IMGEventDummy, IMGMap} from '../../assets';
 import {ImageTemplate} from '../../components';
-import LinearGradient from 'react-native-linear-gradient';
+import {LinearGradient} from 'rnx-gradient';
 import moment from 'moment';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
@@ -152,30 +152,30 @@ const DetailEvent = ({route, navigation}) => {
           colors={['#000000', 'rgba(0, 0, 0, 0)']}
           start={{x: 0, y: 1}}
           end={{x: 0, y: 0}}
-          style={style.dissolveContainer}>
-          <View style={style.containerContent}>
-            <Text style={style.titleText}>{eventDetail?.title}</Text>
-            <View>
-              <View />
-              <Text style={style.textContLoc}>
-                <FeatherIcon name="map-pin" size={25} color="red" />{' '}
-                {eventDetail?.location}, Indonesia
-              </Text>
-            </View>
-            <View>
-              <View />
-              <Text style={style.textContLoc}>
-                <FeatherIcon name="clock" size={25} color="red" />{' '}
-                {moment(eventDetail.date).format('LLLL').slice(0, 3)}
-                {', '}
-                {moment(eventDetail.date).format('LLL')}
-              </Text>
-            </View>
-            <View>
-              <Text style={style.textContLoc}>Attendees</Text>
-            </View>
+          style={style.dissolveContainer}
+        />
+        <View style={style.containerContent}>
+          <Text style={style.titleText}>{eventDetail?.title}</Text>
+          <View>
+            <View />
+            <Text style={style.textContLoc}>
+              <FeatherIcon name="map-pin" size={25} color="red" />{' '}
+              {eventDetail?.location}, Indonesia
+            </Text>
           </View>
-        </LinearGradient>
+          <View>
+            <View />
+            <Text style={style.textContLoc}>
+              <FeatherIcon name="clock" size={25} color="red" />{' '}
+              {moment(eventDetail.date).format('LLLL').slice(0, 3)}
+              {', '}
+              {moment(eventDetail.date).format('LLL')}
+            </Text>
+          </View>
+          <View>
+            <Text style={style.textContLoc}>Attendees</Text>
+          </View>
+        </View>
       </View>
       <ScrollView style={style.containerDetail}>
         <View style={style.containerTextDetail}>
