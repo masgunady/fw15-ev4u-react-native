@@ -14,6 +14,7 @@ import {IMGCard, IMGCard2, IMGProfile} from '../../assets';
 import {useSelector} from 'react-redux';
 import http from '../../helpers/http';
 import {ImageTemplate} from '../../components';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Profile = ({navigation}) => {
   const token = useSelector(state => state.auth.token);
@@ -25,17 +26,21 @@ const Profile = ({navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', () => true);
     };
   }, []);
-  React.useEffect(() => {
-    const getProfile = async () => {
-      const {data} = await http(token).get('/profile');
-      setProfile(data.results);
-    };
-    getProfile();
-  }, [token]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const getProfile = async () => {
+        const {data} = await http(token).get('/profile');
+        setProfile(data.results);
+      };
+      getProfile();
+    }, [token]),
+  );
 
   const handlePressEvent = () => {
     navigation.navigate('Home');
   };
+
   return (
     <View style={style.container}>
       <StatusBar translucent={true} backgroundColor="transparent" />

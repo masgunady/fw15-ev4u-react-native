@@ -1,7 +1,7 @@
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Feather';
-import LinearGradient from 'react-native-linear-gradient';
+import {LinearGradient} from 'rnx-gradient';
 import moment from 'moment';
 import {useNavigation} from '@react-navigation/native';
 
@@ -16,26 +16,26 @@ const EventBox = ({dates, title, eventImage, eventId, ...rest}) => {
 
       <View style={style.wrapAllContent}>
         <LinearGradient
-          colors={['#000000', 'rgba(0, 0, 0, 0)']}
           start={{x: 0, y: 1}}
           end={{x: 0, y: 0}}
-          style={style.dissolveContainer}>
-          <View style={style.warapperTextCont}>
-            <Text style={style.textNew}>
-              {moment(dates).format('LLLL').slice(0, 3)}
-              {', '}
-              {moment(dates).format('LLL')}
-            </Text>
-            <Text style={style.textContaninerNew}>
-              {title.slice(0, 14) + ' ...'}
-            </Text>
-            <TouchableOpacity
-              style={style.button1}
-              onPress={() => handlePressEvent(eventId)}>
-              <Icon name="arrow-right" size={30} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+          colors={['#000000', 'rgba(0, 0, 0, 0)']}
+          style={style.dissolveContainer}
+        />
+        <View style={style.warapperTextCont}>
+          <Text style={style.textNew}>
+            {moment(dates).format('LLLL').slice(0, 3)}
+            {', '}
+            {moment(dates).format('LLL')}
+          </Text>
+          <Text style={style.textContaninerNew}>
+            {title.slice(0, 14) + ' ...'}
+          </Text>
+          <TouchableOpacity
+            style={style.button1}
+            onPress={() => handlePressEvent(eventId)}>
+            <Icon name="arrow-right" size={30} color="#FFF" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

@@ -9,7 +9,7 @@ const SplashScreen = ({navigation}) => {
   React.useEffect(() => {
     if (token) {
       setTimeout(() => {
-        navigation.navigate('Home');
+        navigation.navigate('ProfileEdit');
       }, 1500);
     } else {
       setTimeout(() => {
