@@ -1,4 +1,4 @@
-package com.appgps;
+package com.gndsulistiawan.ev4u;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
