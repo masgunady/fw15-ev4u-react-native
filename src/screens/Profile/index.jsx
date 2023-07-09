@@ -40,6 +40,7 @@ const Profile = ({navigation}) => {
   const handlePressEvent = () => {
     navigation.navigate('Home');
   };
+  console.log(profile.profession);
 
   return (
     <View style={style.container}>
@@ -67,9 +68,9 @@ const Profile = ({navigation}) => {
             </View>
           </View>
           <View style={style.contProfileName}>
-            <Text style={style.name}>{profile.fullName}</Text>
+            <Text style={style.name}>{profile?.fullName}</Text>
             <Text style={style.profesi}>
-              {profile.perofession ? profile.profession : 'Profession : -'}
+              {profile?.profession ? profile?.profession : 'Profession : -'}
             </Text>
           </View>
         </View>
