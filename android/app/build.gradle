@@ -74,9 +74,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.appgps"
+    namespace "com.gndsulistiawan.ev4u"
     defaultConfig {
-        applicationId "com.appgps"
+        applicationId "com.gndsulistiawan.ev4u"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
