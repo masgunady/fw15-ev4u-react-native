@@ -7,6 +7,7 @@ import {
   StatusBar,
   Platform,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -37,6 +38,7 @@ const ProfileEdit = ({navigation}) => {
   const [genderF, setGenderF] = React.useState(false);
   const [fileResponse, setFileResponse] = React.useState([]);
   const [selectedPicture, setSelectedPicture] = React.useState('');
+  const [indicator, setIndicator] = React.useState(false);
   const selectProfession = ['Programmer', 'Designer', 'Analyst'];
   const selectNationality = ['Indonesia', 'Malaysia'];
 
@@ -74,6 +76,7 @@ const ProfileEdit = ({navigation}) => {
   };
 
   const doEdit = async values => {
+    setIndicator(true);
     const form = new FormData();
 
     Object.keys(values).forEach(key => {
@@ -127,13 +130,15 @@ const ProfileEdit = ({navigation}) => {
       const {data} = await http(token).get('/profile');
       setProfile(data.results);
     };
-
+    setIndicator(false);
     setEditEmail(false);
     setEditPhone(false);
     setEditGender(false);
     getProfile();
     setFileResponse([]);
   };
+
+  console.log(indicator);
 
   const handlePressEvent = () => {
     navigation.navigate('Profile');
@@ -149,7 +154,11 @@ const ProfileEdit = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View>
-          <Text style={style.textHeader}>Edit Profile</Text>
+          {indicator ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={style.textHeader}>Edit Profile</Text>
+          )}
         </View>
         <View style={style.contentHeader} />
       </View>

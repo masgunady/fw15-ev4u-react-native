@@ -4,6 +4,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  Modal,
+  Pressable,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -16,6 +20,18 @@ import {useFocusEffect} from '@react-navigation/native';
 const ManageEvent = ({navigation}) => {
   const [eventByMe, setEventByMe] = React.useState([]);
   const token = useSelector(state => state.auth.token);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [eventIds, setEventIds] = React.useState('');
+  const [indicator, setIndicator] = React.useState(false);
+
+  const getEventByMe = React.useCallback(async () => {
+    const {data} = await http(token).get('/event/manage');
+    setEventByMe(data.results);
+  }, [token]);
+
+  React.useEffect(() => {
+    getEventByMe();
+  }, [getEventByMe]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -27,19 +43,35 @@ const ManageEvent = ({navigation}) => {
     }, [token]),
   );
 
+  const handleDeleteEvent = async id => {
+    try {
+      setIndicator(true);
+      setModalVisible(false);
+      const {data} = await http(token).delete(`/event/manage/${id}`);
+      console.log(data);
+      setEventIds(null);
+      getEventByMe();
+      setIndicator(false);
+    } catch (err) {
+      const message = err?.response?.data?.message;
+      if (message) {
+        console.log(message);
+      }
+    }
+  };
   const handlePressEvent = () => {
-    navigation.navigate('Profile');
+    navigation.navigate('Home');
+  };
+  const handleCreateEvent = () => {
+    navigation.navigate('CreateEvent');
+  };
+  const openModalDelete = eventId => {
+    setEventIds(eventId);
+    setModalVisible(true);
   };
 
-  // React.useEffect(() => {
-  //   async function getEventByMe() {
-  //     const {data} = await http(token).get('/event/manage');
-  //     setEventByMe(data.results);
-  //   }
-  //   if (token) {
-  //     getEventByMe();
-  //   }
-  // }, [token, setEventByMe]);
+  console.log(eventIds);
+
   return (
     <View style={style.container}>
       <StatusBar translucent={true} backgroundColor="transparent" />
@@ -50,12 +82,20 @@ const ManageEvent = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View>
-          <Text style={style.textHeader}>Manage Event</Text>
+          {indicator ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={style.textHeader}>Manage Event</Text>
+          )}
         </View>
         <View style={style.contentHeader} />
       </View>
       <ScrollView style={style.containerWishlist}>
-        <BtnMinOpacity icon="plus-circle" text="Create" />
+        <BtnMinOpacity
+          icon="plus-circle"
+          text="Create"
+          createEventFunc={() => handleCreateEvent()}
+        />
         <View style={style.wrapperWishlist}>
           {eventByMe.length < 1 && (
             <HandleNullItem noItem="event found" noItemSub="event" />
@@ -72,17 +112,96 @@ const ManageEvent = ({navigation}) => {
                 date={item?.date}
                 day={item?.date}
                 forManageEvent
-                // addRemoveWishlist={() => addRemoveWishlist(`${item.eventId}`)}
+                funcEventCreateDelete={() => openModalDelete(item.id)}
               />
             );
           })}
         </View>
       </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={style.centeredView}>
+          <View style={style.modalView}>
+            <Text style={style.modalText}>Confirm Delete ?</Text>
+            <View style={style.wrapModalBtn}>
+              <Pressable
+                style={[style.button, style.buttonClose]}
+                onPress={() => handleDeleteEvent(eventIds)}>
+                <Text style={style.textStyleYes}>Yes</Text>
+              </Pressable>
+              <Pressable
+                style={[style.button, style.buttonOpen]}
+                onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={style.textStyleNo}>No</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const style = StyleSheet.create({
+  wrapModalBtn: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: 300,
+  },
+  button: {
+    marginTop: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
+    width: 70,
+  },
+  buttonOpen: {
+    backgroundColor: '#b6e5a8',
+  },
+  buttonClose: {
+    backgroundColor: '#ffdcb3',
+  },
+  textStyleYes: {
+    color: '#FF8900',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  textStyleNo: {
+    color: '#49be25',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
   container: {
     paddingTop: 30,
     backgroundColor: '#4c3f91',

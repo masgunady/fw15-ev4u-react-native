@@ -2,10 +2,10 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
-const BtnMinOpacity = ({icon, text}) => {
+const BtnMinOpacity = ({icon, text, createEventFunc}) => {
   return (
     <View style={style.contBtnTopManage}>
-      <TouchableOpacity style={style.btnTopManage}>
+      <TouchableOpacity style={style.btnTopManage} onPress={createEventFunc}>
         <FeatherIcon name={icon} size={25} color="#4c3f91" />
         <Text style={style.textTopManage}>{text}</Text>
       </TouchableOpacity>
