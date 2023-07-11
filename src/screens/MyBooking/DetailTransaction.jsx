@@ -11,21 +11,39 @@ import {useSelector} from 'react-redux';
 import http from '../../helpers/http';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import moment from 'moment';
+import {store} from '../../redux/store';
+import {setTransactionData} from '../../redux/reducers/transaction';
+import {useFocusEffect} from '@react-navigation/native';
 
 const DetailTransaction = ({route, navigation}) => {
   const {id} = route.params;
   const token = useSelector(state => state.auth.token);
   const [detailTransaction, setDetailTransaction] = React.useState({});
 
-  React.useEffect(() => {
-    const getDetailTransaction = async () => {
-      const {data} = await http(token).get(`/history/${id}`);
-      setDetailTransaction(data.results);
-    };
-    getDetailTransaction(id);
-  }, [token, id]);
+  useFocusEffect(
+    React.useCallback(() => {
+      const getDetailTransaction = async () => {
+        const {data} = await http(token).get(`/history/${id}`);
+        setDetailTransaction(data.results);
+      };
+      getDetailTransaction(id);
+    }, [token, id]),
+  );
+
   const handlePressEvent = () => {
     navigation.navigate('MyBooking');
+  };
+  const dataBooking = {
+    eventId: detailTransaction?.eventId,
+    eventName: detailTransaction?.title,
+    reservationId: detailTransaction?.reservationId,
+    sectionName: detailTransaction?.ticketSection,
+    quantity: detailTransaction?.quantity,
+    totalPayment: detailTransaction?.totalPrice,
+  };
+  const handlePressPayment = () => {
+    store.dispatch(setTransactionData(dataBooking));
+    navigation.navigate('Payment');
   };
   return (
     <View style={style.container}>
@@ -45,20 +63,22 @@ const DetailTransaction = ({route, navigation}) => {
         <View style={style.wrapperWishlist}>
           <View>
             <Text style={style.textDetaiBold}>
-              Order ID : {detailTransaction.reservationId}
+              Order ID : {detailTransaction?.reservationId}
             </Text>
           </View>
           <View style={style.containerInfoPayment}>
             <View style={style.sectInfoPayment}>
               <Text style={style.textLite}>Grand Total</Text>
               <Text style={style.textDetaiBold}>
-                IDR {detailTransaction.totalPrice}
+                IDR {detailTransaction?.totalPrice}
               </Text>
             </View>
             <View style={style.sectInfoPayment}>
               <Text style={style.textLite}>Order Paid Date</Text>
               <Text style={style.textDetaiBold}>
-                {moment(detailTransaction.paymentDate).format('DD/MM/YY')}
+                {detailTransaction?.paymentMethod === 'Not Defined'
+                  ? '-'
+                  : moment(detailTransaction?.paymentDate).format('DD/MM/YY')}
               </Text>
             </View>
           </View>
@@ -68,23 +88,23 @@ const DetailTransaction = ({route, navigation}) => {
             <View style={style.containerInfoPaymentBetween}>
               <View style={style.sectInfoPayment}>
                 <Text style={style.textLite}>
-                  {detailTransaction.title} - Tickets
+                  {detailTransaction?.title} - Tickets
                 </Text>
                 <Text style={style.textLite}>
-                  {detailTransaction.location}, Indonesia
+                  {detailTransaction?.location}, Indonesia
                 </Text>
                 <Text style={style.textLite}>
-                  {moment(detailTransaction.date).format('LLLL').slice(0, 3)}
+                  {moment(detailTransaction?.date).format('LLLL').slice(0, 3)}
                   {', '}
-                  {moment(detailTransaction.date).format('LLL')}
+                  {moment(detailTransaction?.date).format('LLL')}
                 </Text>
               </View>
               <View style={style.itemEnd}>
                 <Text style={style.textLite}>
-                  x{detailTransaction.quantity}
+                  x{detailTransaction?.quantity}
                 </Text>
                 <Text style={style.textLiteUpp}>
-                  IDR {detailTransaction.ticketPrice}
+                  IDR {detailTransaction?.ticketPrice}
                 </Text>
               </View>
             </View>
@@ -96,7 +116,7 @@ const DetailTransaction = ({route, navigation}) => {
               <Text style={style.textLite}>payment method</Text>
               <View style={style.itemEnd}>
                 <Text style={style.textLite}>
-                  {detailTransaction.paymentMethod}
+                  {detailTransaction?.paymentMethod}
                 </Text>
               </View>
             </View>
@@ -104,7 +124,7 @@ const DetailTransaction = ({route, navigation}) => {
               <Text style={style.textLite}>section</Text>
               <View style={style.itemEnd}>
                 <Text style={style.textLiteUpp}>
-                  {detailTransaction.ticketSection}
+                  {detailTransaction?.ticketSection}
                 </Text>
               </View>
             </View>
@@ -112,7 +132,7 @@ const DetailTransaction = ({route, navigation}) => {
               <Text style={style.textLite}>ticket price</Text>
               <View style={style.itemEnd}>
                 <Text style={style.textLiteUpp}>
-                  IDR {detailTransaction.ticketPrice}
+                  IDR {detailTransaction?.ticketPrice}
                 </Text>
               </View>
             </View>
@@ -120,7 +140,7 @@ const DetailTransaction = ({route, navigation}) => {
               <Text style={style.textLite}>Quantity</Text>
               <View style={style.itemEnd}>
                 <Text style={style.textLite}>
-                  x {detailTransaction.quantity}
+                  x {detailTransaction?.quantity}
                 </Text>
               </View>
             </View>
@@ -128,10 +148,19 @@ const DetailTransaction = ({route, navigation}) => {
               <Text style={style.textLiteBold}>Grand Total</Text>
               <View style={style.itemEnd}>
                 <Text style={style.textLiteUppBold}>
-                  IDR {detailTransaction.totalPrice}
+                  IDR {detailTransaction?.totalPrice}
                 </Text>
               </View>
             </View>
+            {detailTransaction?.paymentMethod === 'Not Defined' && (
+              <View style={style.btnContainer}>
+                <TouchableOpacity
+                  style={style.touchButton}
+                  onPress={() => handlePressPayment()}>
+                  <Text style={style.textTouch}>Change Payment Methods</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -140,6 +169,28 @@ const DetailTransaction = ({route, navigation}) => {
 };
 
 const style = StyleSheet.create({
+  textTouch: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+  },
+  touchButton: {
+    backgroundColor: '#4c3f91',
+    width: '100%',
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    shadowColor: 'black',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  btnContainer: {
+    paddingTop: 50,
+    width: '100%',
+  },
   itemEnd: {
     alignItems: 'flex-end',
   },

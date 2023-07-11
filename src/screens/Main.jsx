@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  SplashScreen,
   SignIn,
   Register,
   ForgotPassword,
@@ -36,24 +35,12 @@ const Drawer = createDrawerNavigator();
 import {useDispatch} from 'react-redux';
 import {logout} from '../redux/reducers/auth';
 import {StyleSheet, Text, View} from 'react-native';
-import http from '../helpers/http';
 import {ImageTemplate} from '../components';
 import {IMGProfile} from '../assets';
 
 function CustomDrawerContent(props) {
   const dispatch = useDispatch();
-  const token = useSelector(state => state.auth.token);
-  const [profile, setProfile] = React.useState({});
-
-  React.useEffect(() => {
-    if (token) {
-      const getProfile = async () => {
-        const {data} = await http(token).get('/profile');
-        setProfile(data.results);
-      };
-      getProfile();
-    }
-  }, [token]);
+  const profile = useSelector(state => state.profileData.profileData);
 
   return (
     <DrawerContentScrollView {...props}>
@@ -74,7 +61,7 @@ function CustomDrawerContent(props) {
               profile?.fullName?.slice(0, 14) + ' ...'}
           </Text>
           <Text style={style.textProfession}>
-            {profile.profession ? profile.profession : 'profession: -'}
+            {profile?.profession ? profile?.profession : 'profession: -'}
           </Text>
         </View>
       </View>
@@ -149,42 +136,11 @@ function MyDrawer() {
         },
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}>
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="SplashScreen"
         component={SplashScreen}
         options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-      <Drawer.Screen
-        name="Booking"
-        component={Booking}
-        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-      <Drawer.Screen
-        name="Payment"
-        component={Payment}
-        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-      <Drawer.Screen
-        name="DetailEvent"
-        component={DetailEvent}
-        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-      <Drawer.Screen
-        name="ProfileEdit"
-        component={ProfileEdit}
-        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-      <Drawer.Screen
-        name="ChangePassword"
-        component={ChangePassword}
-        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-      <Drawer.Screen
-        name="DetailTransaction"
-        component={DetailTransaction}
-        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
-      />
-
+      /> */}
       <Drawer.Screen
         name="Home"
         component={Home}
@@ -235,6 +191,36 @@ function MyDrawer() {
           drawerLabel: 'My Wishlist',
         }}
       />
+      <Drawer.Screen
+        name="Booking"
+        component={Booking}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+      <Drawer.Screen
+        name="Payment"
+        component={Payment}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+      <Drawer.Screen
+        name="DetailEvent"
+        component={DetailEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+      <Drawer.Screen
+        name="ProfileEdit"
+        component={ProfileEdit}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+      <Drawer.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+      <Drawer.Screen
+        name="DetailTransaction"
+        component={DetailTransaction}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
     </Drawer.Navigator>
   );
 }
@@ -245,7 +231,7 @@ const Main = () => {
     <NavigationContainer>
       {!token && (
         <AuthStack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
+          {/* <Stack.Screen name="SplashScreen" component={SplashScreen} /> */}
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />

@@ -6,41 +6,18 @@ import {
   TouchableOpacity,
   StatusBar,
   Image,
-  BackHandler,
 } from 'react-native';
 import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {IMGCard, IMGCard2, IMGProfile} from '../../assets';
 import {useSelector} from 'react-redux';
-import http from '../../helpers/http';
 import {ImageTemplate} from '../../components';
-import {useFocusEffect} from '@react-navigation/native';
 
 const Profile = ({navigation}) => {
-  const token = useSelector(state => state.auth.token);
-  const [profile, setProfile] = React.useState({});
-
-  React.useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', () => true);
-    return () => {
-      BackHandler.addEventListener('hardwareBackPress', () => true);
-    };
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      const getProfile = async () => {
-        const {data} = await http(token).get('/profile');
-        setProfile(data.results);
-      };
-      getProfile();
-    }, [token]),
-  );
-
+  const profile = useSelector(state => state.profileData.profileData);
   const handlePressEvent = () => {
     navigation.navigate('Home');
   };
-  console.log(profile.profession);
 
   return (
     <View style={style.container}>

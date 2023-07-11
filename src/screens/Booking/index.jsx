@@ -13,10 +13,15 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {useSelector} from 'react-redux';
 import http from '../../helpers/http';
+import {store} from '../../redux/store';
+import {setTransactionData} from '../../redux/reducers/transaction';
+// import {clearEventId} from '../../redux/reducers/eventId';
 
-const Booking = ({route, navigation}) => {
-  const {eventId} = route.params;
+const Booking = ({navigation}) => {
+  // const dispatch = useDispatch();
+
   const token = useSelector(state => state.auth.token);
+  const eventId = useSelector(state => state.eventId.eventId);
   const [sections, setSections] = React.useState([]);
   const [filledSection, setFilledSection] = React.useState({
     id: 0,
@@ -54,18 +59,25 @@ const Booking = ({route, navigation}) => {
     }).toString();
     const {data} = await http(token).post('/reservation', form);
 
-    navigation.navigate('Payment', {
-      state: {
-        eventId,
-        eventName: data.results.events.title,
-        reservationId: data.results.id,
-        sectionName: data.results.sectionName,
-        quantity: data.results.quantity,
-        totalPayment: data.results.totalPrice,
-      },
-      replace: true,
-    });
+    const dataBooking = {
+      eventId,
+      eventName: data.results.events.title,
+      reservationId: data.results.id,
+      sectionName: data.results.sectionName,
+      quantity: data.results.quantity,
+      totalPayment: data.results.totalPrice,
+    };
+
+    store.dispatch(setTransactionData(dataBooking));
+    navigation.navigate('Payment');
+    // dispatch(clearEventId());
   };
+
+  React.useEffect(() => {
+    if (eventId === null) {
+      navigation.navigate('MyBooking');
+    }
+  }, [eventId, navigation]);
 
   const handlePressEvent = id => {
     navigation.navigate('DetailEvent', {id});
@@ -166,11 +178,15 @@ const Booking = ({route, navigation}) => {
                 <Text style={style.getOwn}>Get now on Urticket</Text>
               </View>
             </View>
-            <TouchableOpacity
-              onPress={doReservation}
-              style={style.touchCheckOut}>
-              <Text style={style.textCheckout}>Checkout</Text>
-            </TouchableOpacity>
+            {filledSection.id === 0 || filledSection.quantity === 0 ? (
+              <Text>Select Tickets</Text>
+            ) : (
+              <TouchableOpacity
+                onPress={doReservation}
+                style={style.touchCheckOut}>
+                <Text style={style.textCheckout}>Checkout</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>

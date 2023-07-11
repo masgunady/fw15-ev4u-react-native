@@ -12,6 +12,7 @@ const EventList = ({
   location,
   date,
   day,
+  paymentMethod,
   addRemoveWishlist,
   forWishlist,
   forMyBooking,
@@ -34,6 +35,16 @@ const EventList = ({
             </TouchableOpacity>
           </View>
         )}
+        {forMyBooking &&
+          (paymentMethod === 'Not Defined' ? (
+            <View style={style.containerPending}>
+              <Text style={style.pendingText}>Pending</Text>
+            </View>
+          ) : (
+            <View style={style.containerPaid}>
+              <Text style={style.paidText}>Success</Text>
+            </View>
+          ))}
       </View>
       <View style={style.sectionWishlistRight}>
         <View>
@@ -81,6 +92,26 @@ const EventList = ({
 };
 
 const style = StyleSheet.create({
+  containerPaid: {
+    backgroundColor: '#b6e5a8',
+    padding: 5,
+    borderRadius: 10,
+  },
+  paidText: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 12,
+    color: '#49be25',
+  },
+  containerPending: {
+    backgroundColor: '#ffdcb3',
+    padding: 5,
+    borderRadius: 10,
+  },
+  pendingText: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 12,
+    color: '#FF8900',
+  },
   container: {
     paddingTop: 30,
     backgroundColor: '#4c3f91',

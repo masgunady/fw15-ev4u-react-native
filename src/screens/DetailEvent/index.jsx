@@ -17,6 +17,8 @@ import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {useSelector} from 'react-redux';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useFocusEffect} from '@react-navigation/native';
+import {setEventId} from '../../redux/reducers/eventId';
+import {store} from '../../redux/store';
 
 const DetailEvent = ({route, navigation}) => {
   const {id} = route.params;
@@ -72,6 +74,7 @@ const DetailEvent = ({route, navigation}) => {
 
   const handlePressEvent = eventId => {
     navigation.navigate('Booking', {eventId});
+    store.dispatch(setEventId(eventId));
   };
 
   // React.useEffect(() => {
@@ -134,7 +137,7 @@ const DetailEvent = ({route, navigation}) => {
         />
         <View style={style.drawerContainer}>
           <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <TouchableOpacity onPress={() => navigation.replace('HomeMain')}>
               <FeatherIcon name="arrow-left" size={35} color="#FFF" />
             </TouchableOpacity>
           </View>

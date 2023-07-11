@@ -12,31 +12,38 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import EndIcon from 'react-native-vector-icons/Entypo';
 import {IMGCard} from '../../assets';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import http from '../../helpers/http';
+import {clearTransactionData} from '../../redux/reducers/transaction';
+// import {clearEventId} from '../../redux/reducers/eventId';
 
-const Payment = ({route, navigation}) => {
-  const {state} = route.params;
+const Payment = ({navigation}) => {
+  const dispatch = useDispatch();
+
   const token = useSelector(state => state.auth.token);
-
+  const bookingData = useSelector(state => state.transaction.transactionData);
   const [paymentMethod, setPaymentMethod] = React.useState('1');
 
   const handlePaymentMethodChange = value => {
     setPaymentMethod(value);
   };
 
+  // React.useEffect(() => {
+  //   if (bookingData === null) {
+  //     navigation.navigate('Home');
+  //   }
+  // }, [bookingData, navigation, dispatch]);
+
   const doPayment = async () => {
-    // console.log(selectedPayment)
-    const {reservationId} = state;
+    const {reservationId} = bookingData;
     const form = new URLSearchParams({
       reservationId,
       paymentMethodId: paymentMethod,
     }).toString();
     const {data} = await http(token).post('/payment', form);
     if (data) {
-      navigation.navigate('MyBooking', {
-        replace: true,
-      });
+      navigation.navigate('MyBooking');
+      dispatch(clearTransactionData());
     }
   };
   return (
@@ -147,7 +154,7 @@ const Payment = ({route, navigation}) => {
               <Text style={style.reslutsText}>Total Payment</Text>
             </View>
             <View style={style.getOwnCont}>
-              <Text style={style.getOwn}>IDR {state.totalPayment}</Text>
+              <Text style={style.getOwn}>IDR {bookingData?.totalPayment}</Text>
             </View>
           </View>
           <TouchableOpacity onPress={doPayment} style={style.touchCheckOut}>
