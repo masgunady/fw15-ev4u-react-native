@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  RefreshControl,
 } from 'react-native';
 import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -15,17 +16,30 @@ import {useFocusEffect} from '@react-navigation/native';
 
 const MyBooking = ({navigation}) => {
   const [reservationByMe, setReservationByMe] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
   const token = useSelector(state => state.auth.token);
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        const {data} = await http(token).get('/history');
+        const {data} = await http(token).get('/history?sort=id&sortBy=DESC');
         setReservationByMe(data.results);
       };
       fetchData();
     }, [token]),
   );
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    const fetchData = async () => {
+      const {data} = await http(token).get('/history?sort=id&sortBy=DESC');
+      setReservationByMe(data.results);
+    };
+    fetchData();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, [token]);
 
   // React.useEffect(() => {
   //   async function getEventByMe() {
@@ -38,7 +52,7 @@ const MyBooking = ({navigation}) => {
   // }, [token, setReservationByMe]);
 
   const handlePressEvent = () => {
-    navigation.navigate('Profile');
+    navigation.navigate('Home');
   };
   const handlePressDetail = id => {
     navigation.navigate('DetailTransaction', {id});
@@ -57,7 +71,11 @@ const MyBooking = ({navigation}) => {
         </View>
         <View style={style.contentHeader} />
       </View>
-      <ScrollView style={style.containerWishlist}>
+      <ScrollView
+        style={style.containerWishlist}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <BtnMinOpacity icon="calendar" text="October" />
         <View style={style.wrapperWishlist}>
           {reservationByMe.length < 1 && (
@@ -70,13 +88,14 @@ const MyBooking = ({navigation}) => {
             return (
               <EventList
                 key={`booiking-manage-${item.id}`}
-                dateBoxDate={item?.date}
-                dateBoxDay={item?.date}
+                dateBoxDate={item?.reservationDate}
+                dateBoxDay={item?.reservationDate}
                 eventSpecId={item.eventId}
                 title={item.title}
                 location={item.location}
                 date={item?.date}
                 day={item?.date}
+                paymentMethod={item?.paymentMethod}
                 forMyBooking
                 transactionDetail={() => handlePressDetail(item.id)}
               />

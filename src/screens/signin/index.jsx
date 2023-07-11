@@ -14,6 +14,7 @@ import {asyncLogin} from '../../redux/actions/auth';
 import {clearMessage} from '../../redux/reducers/auth';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import SplashScreen from 'react-native-splash-screen';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -25,6 +26,9 @@ const validationSchema = Yup.object({
 const SignIn = ({navigation}) => {
   const dispatch = useDispatch();
   const errorMessage = useSelector(state => state.auth.errorMessage);
+  React.useState(() => {
+    SplashScreen.hide();
+  }, []);
   const doLogin = values => {
     dispatch(asyncLogin(values));
   };

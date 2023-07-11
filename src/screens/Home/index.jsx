@@ -6,7 +6,6 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
-  BackHandler,
 } from 'react-native';
 import React from 'react';
 
@@ -16,6 +15,13 @@ import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {EventBox, CategoryBox, DateBox} from '../../components';
 import http from '../../helpers/http';
 import {useSelector} from 'react-redux';
+import SplashScreen from 'react-native-splash-screen';
+import {store} from '../../redux/store';
+import {setProfileData} from '../../redux/reducers/profileData';
+// import {createNativeStackNavigator} from '@react-navigation/native-stack';
+// import {Booking, DetailEvent, MyBooking, Payment} from '../index';
+
+// const Stack = createNativeStackNavigator();
 
 const Home = () => {
   const navigation = useNavigation();
@@ -33,18 +39,26 @@ const Home = () => {
       const {data} = await http().get('/event?sort=id&sortBy=desc');
       setEvent(data.results);
     }
-    saveToken();
     getEvent();
+  }, []);
+
+  React.useEffect(() => {
+    async function getProfile() {
+      const {data} = await http(token).get('/profile');
+      store.dispatch(setProfileData(data.results));
+    }
+    getProfile();
+  }, [saveToken, token]);
+
+  React.useEffect(() => {
+    saveToken();
   }, [saveToken]);
 
-  const uniqueDates = [...new Set(events.map(item => item?.date))];
+  React.useState(() => {
+    SplashScreen.hide();
+  }, []);
 
-  // React.useEffect(() => {
-  //   BackHandler.addEventListener('hardwareBackPress', () => true);
-  //   return () => {
-  //     BackHandler.addEventListener('hardwareBackPress', () => true);
-  //   };
-  // }, []);
+  const uniqueDates = [...new Set(events.map(item => item?.date))];
 
   return (
     <View style={style.wrapper}>
@@ -291,4 +305,15 @@ const style = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+// const HomeStack = () => {
+//   return (
+//     <Stack.Navigator screenOptions={{headerShown: false}}>
+//       <Stack.Screen name="HomeMain" component={Home} />
+//       <Stack.Screen name="DetailEvent" component={DetailEvent} />
+//       <Stack.Screen name="Booking" component={Booking} />
+//       <Stack.Screen name="Payment" component={Payment} />
+//     </Stack.Navigator>
+//   );
+// };
 export default Home;

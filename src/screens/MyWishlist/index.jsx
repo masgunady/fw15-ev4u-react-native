@@ -53,7 +53,7 @@ const MyWishlist = ({navigation}) => {
   };
 
   const handlePressEvent = () => {
-    navigation.navigate('Profile');
+    navigation.navigate('Home');
   };
   return (
     <View style={style.container}>

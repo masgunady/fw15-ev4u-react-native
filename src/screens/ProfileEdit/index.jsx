@@ -12,7 +12,7 @@ import React from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {IMGProfile} from '../../assets';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import http from '../../helpers/http';
 import {ImageTemplate, Input} from '../../components';
 import SelectDropdown from 'react-native-select-dropdown';
@@ -20,9 +20,11 @@ import {Formik} from 'formik';
 import {RadioButton} from 'react-native-paper';
 import moment from 'moment';
 import DatePicker from 'react-native-date-picker';
+import {setProfileData} from '../../redux/reducers/profileData';
 
 const ProfileEdit = ({navigation}) => {
   const token = useSelector(state => state.auth.token);
+  const dispatch = useDispatch();
   const [profile, setProfile] = React.useState({});
   const [profession, setProfession] = React.useState('');
   const [nationality, setNationality] = React.useState('');
@@ -116,6 +118,7 @@ const ProfileEdit = ({navigation}) => {
       });
 
       setProfile(data.results);
+      dispatch(setProfileData(data.results));
     } catch (err) {
       console.warn(err);
     }
