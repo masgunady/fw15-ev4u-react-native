@@ -16,6 +16,7 @@ import {
   ManageEvent,
   DetailTransaction,
   CreateEvent,
+  Details,
 } from './index';
 
 import {NavigationContainer} from '@react-navigation/native';
@@ -38,6 +39,7 @@ import {logout} from '../redux/reducers/auth';
 import {StyleSheet, Text, View} from 'react-native';
 import {ImageTemplate} from '../components';
 import {IMGProfile} from '../assets';
+import UpdateEvent from './ManageEvent/UpdateEvent';
 
 function CustomDrawerContent(props) {
   const dispatch = useDispatch();
@@ -138,6 +140,16 @@ function MyDrawer() {
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
+        name="Home"
+        component={Home}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FontAwesome5Icon name="home" color={color} size={size} />
+          ),
+          drawerLabel: 'Home',
+        }}
+      />
+      <Drawer.Screen
         name="ManageEvent"
         component={ManageEvent}
         options={{
@@ -145,6 +157,37 @@ function MyDrawer() {
             <FeatherIcon name="plus-circle" color={color} size={size} />
           ),
           drawerLabel: 'Manage Event',
+        }}
+      />
+      <Drawer.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FeatherIcon name="user" color={color} size={size} />
+          ),
+          drawerLabel: 'Profile',
+        }}
+      />
+
+      <Drawer.Screen
+        name="MyBooking"
+        component={MyBooking}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FeatherIcon name="clipboard" color={color} size={size} />
+          ),
+          drawerLabel: 'My Booking',
+        }}
+      />
+      <Drawer.Screen
+        name="MyWishlist"
+        component={MyWishlist}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FeatherIcon name="heart" color={color} size={size} />
+          ),
+          drawerLabel: 'My Wishlist',
         }}
       />
       <Drawer.Screen
@@ -182,47 +225,15 @@ function MyDrawer() {
         component={DetailTransaction}
         options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
-
       <Drawer.Screen
-        name="Home"
-        component={Home}
-        options={{
-          drawerIcon: ({color, size}) => (
-            <FontAwesome5Icon name="home" color={color} size={size} />
-          ),
-          drawerLabel: 'Home',
-        }}
+        name="Details"
+        component={Details}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
       <Drawer.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          drawerIcon: ({color, size}) => (
-            <FeatherIcon name="user" color={color} size={size} />
-          ),
-          drawerLabel: 'Profile',
-        }}
-      />
-
-      <Drawer.Screen
-        name="MyBooking"
-        component={MyBooking}
-        options={{
-          drawerIcon: ({color, size}) => (
-            <FeatherIcon name="clipboard" color={color} size={size} />
-          ),
-          drawerLabel: 'My Booking',
-        }}
-      />
-      <Drawer.Screen
-        name="MyWishlist"
-        component={MyWishlist}
-        options={{
-          drawerIcon: ({color, size}) => (
-            <FeatherIcon name="heart" color={color} size={size} />
-          ),
-          drawerLabel: 'My Wishlist',
-        }}
+        name="UpdateEvent"
+        component={UpdateEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
     </Drawer.Navigator>
   );
