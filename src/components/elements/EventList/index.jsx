@@ -18,9 +18,9 @@ const EventList = ({
   forMyBooking,
   forManageEvent,
   transactionDetail,
-  funcEventCreateDetail,
-  funcEventCreateUpdate,
-  funcEventCreateDelete,
+  funcEventDetail,
+  funcEventUpdate,
+  funcEventDelete,
 }) => {
   return (
     <View style={style.wishlistContainer} key={keyMaps}>
@@ -74,13 +74,13 @@ const EventList = ({
           )}
           {forManageEvent && (
             <View style={style.btnGroupEvent}>
-              <TouchableOpacity onPress={funcEventCreateDetail}>
+              <TouchableOpacity onPress={funcEventDetail}>
                 <Text style={style.textBtnDetail}>Detail</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={funcEventCreateUpdate}>
+              <TouchableOpacity onPress={funcEventUpdate}>
                 <Text style={style.textBtnDetail}>Update</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={funcEventCreateDelete}>
+              <TouchableOpacity onPress={funcEventDelete}>
                 <Text style={style.textBtnDetail}>Delete</Text>
               </TouchableOpacity>
             </View>

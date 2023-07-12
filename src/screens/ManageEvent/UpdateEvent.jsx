@@ -14,25 +14,42 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useSelector} from 'react-redux';
 import http from '../../helpers/http';
-import {Input} from '../../components';
+import {ImageTemplate, Input} from '../../components';
 import {Formik} from 'formik';
 import moment from 'moment';
 import DatePicker from 'react-native-date-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {IMGEventDummy} from '../../assets';
 
-const CreateEvent = ({navigation}) => {
+const UpdateEvent = ({route, navigation}) => {
+  const {id} = route.params;
   const token = useSelector(state => state.auth.token);
   const [category, setCategory] = React.useState([]);
   const [location, setLocation] = React.useState([]);
   const [openDate, setOpenDate] = React.useState(false);
   const [openCategory, setOpenCategory] = React.useState(false);
   const [openLocation, setOpenLocation] = React.useState(false);
-  const [date, setDate] = React.useState(new Date());
   const [categoryValue, setCategoryValue] = React.useState(null);
   const [locationValue, setLocationValue] = React.useState(null);
   const [fileResponse, setFileResponse] = React.useState([]);
   const [selectedPicture, setSelectedPicture] = React.useState('');
   const [indicator, setIndicator] = React.useState(false);
+  const [detailEvent, setDetailEvent] = React.useState({});
+  const [openEditCategory, setOpenEditCategory] = React.useState(false);
+  const [openEditDate, setOpenEditDate] = React.useState(false);
+  const [openEditLocation, setOpenEditLocation] = React.useState(false);
+  const [date, setDate] = React.useState(new Date());
+
+  React.useEffect(() => {
+    setIndicator(true);
+    const getDetailEvent = async () => {
+      const {data} = await http(token).get(`/event/manage/${id}`);
+      setDetailEvent(data.results);
+      setIndicator(false);
+    };
+
+    getDetailEvent();
+  }, [token, id]);
 
   React.useEffect(() => {
     const getCategory = async () => {
@@ -83,7 +100,7 @@ const CreateEvent = ({navigation}) => {
     }
   };
 
-  const doCreateEvent = async (values, {resetForm}) => {
+  const doUpdateEvent = async (values, {resetForm}) => {
     setIndicator(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
@@ -101,30 +118,52 @@ const CreateEvent = ({navigation}) => {
     if (fileResponse.length > 1) {
       form.append('picture', fileImage);
     }
-    form.append('categoryId', categoryValue);
-    form.append('cityId', locationValue);
-    if (date) {
+    if (categoryValue) {
+      form.append('categoryId', categoryValue);
+    }
+    if (locationValue) {
+      form.append('cityId', locationValue);
+    }
+    if (date.toDateString() !== new Date().toDateString()) {
       form.append('date', moment(date).format('YYYY-MM-DD'));
     }
 
-    try {
-      const {data} = await http(token).patch('/event/manage', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    } catch (err) {
-      console.warn(err);
+    const dateNow = new Date();
+    console.log(date.toDateString());
+    console.log(dateNow.toDateString());
+    console.log(form._parts.length);
+    if (form._parts.length === 0) {
+      setIndicator(false);
+      navigation.navigate('ManageEvent');
+    } else {
+      try {
+        const {data} = await http(token).patch(`/event/manage/${id}`, form, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } catch (err) {
+        console.warn(err);
+      }
+      setIndicator(false);
+      setFileResponse([]);
+      setSelectedPicture('');
+      setLocationValue(null);
+      setCategoryValue(null);
+      resetForm();
+      navigation.navigate('ManageEvent');
     }
-    setIndicator(false);
-    setFileResponse([]);
-    setSelectedPicture('');
-    setCategoryValue(null);
-    setLocationValue(null);
-    resetForm();
-    navigation.navigate('ManageEvent');
   };
 
+  const handleOpenEditCategory = () => {
+    setOpenEditCategory(true);
+  };
+  const handleOpenEditDate = () => {
+    setOpenEditDate(true);
+  };
+  const handleOpenEditLocation = () => {
+    setOpenEditLocation(true);
+  };
   const handlePressEvent = () => {
     navigation.navigate('ManageEvent');
   };
@@ -141,42 +180,43 @@ const CreateEvent = ({navigation}) => {
           {indicator ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={style.textHeader}>Create Event</Text>
+            <Text style={style.textHeader}>Update Event</Text>
           )}
         </View>
         <View style={style.contentHeader} />
       </View>
       <Formik
         initialValues={{
-          title: '',
-          date: '',
-          cityId: '',
-          descriptions: '',
-          categoryId: '',
+          title: detailEvent?.title,
+          date: detailEvent?.date,
+          cityId: detailEvent?.cityId,
+          descriptions: detailEvent?.descriptions,
+          categoryId: detailEvent?.categoryId,
         }}
-        onSubmit={doCreateEvent}>
+        onSubmit={doUpdateEvent}>
         {({values, handleBlur, handleChange, handleSubmit}) => {
           return (
             <View style={style.containerProfile}>
               <ScrollView>
                 <View style={style.profileWrapper}>
-                  {!selectedPicture && (
-                    <View>
-                      <FeatherIcon name="camera" size={25} color="grey" />
-                    </View>
-                  )}
-                  {selectedPicture && (
-                    <View style={style.photosContent}>
-                      <View style={style.photoIcons}>
+                  <View style={style.photosContent}>
+                    <View style={style.photoIcons}>
+                      {selectedPicture ? (
                         <Image
                           style={style.fotoProfile}
                           src={selectedPicture.uri}
                           width={90}
                           height={90}
                         />
-                      </View>
+                      ) : (
+                        <ImageTemplate
+                          src={detailEvent?.picture || null}
+                          defaultImg={IMGEventDummy}
+                          style={style.IMGProfiles}
+                        />
+                      )}
                     </View>
-                  )}
+                  </View>
                   <View style={style.textGap20}>
                     <TouchableOpacity onPress={() => getImage()}>
                       <Text>Choose Picture</Text>
@@ -188,7 +228,7 @@ const CreateEvent = ({navigation}) => {
                     <Text>Title</Text>
                     <View>
                       <Input
-                        placeholder="Input Title"
+                        placeholder={detailEvent.title}
                         onChangeText={handleChange('title')}
                         onBlur={handleBlur('title')}
                         value={values.title}
@@ -198,70 +238,110 @@ const CreateEvent = ({navigation}) => {
 
                   <View style={style.formInput}>
                     <Text>Category</Text>
-                    <View>
-                      <DropDownPicker
-                        placeholder="Select Category"
-                        dropDownContainerStyle={style.dropPicker}
-                        textStyle={style.textPicker}
-                        open={openCategory}
-                        value={categoryValue}
-                        items={category}
-                        setOpen={setOpenCategory}
-                        setValue={setCategoryValue}
-                        setItems={setCategory}
-                        zIndex={1000}
-                        listMode="SCROLLVIEW"
-                      />
-                    </View>
+                    {!openEditCategory ? (
+                      <View style={style.editBetween}>
+                        <Text>{detailEvent.eventCategory}</Text>
+                        <TouchableOpacity onPress={handleOpenEditCategory}>
+                          <Text>Edit</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View>
+                        <DropDownPicker
+                          placeholder="Select Category"
+                          dropDownContainerStyle={style.dropPicker}
+                          textStyle={style.textPicker}
+                          open={openCategory}
+                          value={categoryValue}
+                          items={category}
+                          setOpen={setOpenCategory}
+                          setValue={setCategoryValue}
+                          setItems={setCategory}
+                          zIndex={1000}
+                          listMode="SCROLLVIEW"
+                        />
+                      </View>
+                    )}
                   </View>
 
                   <View style={style.formInput}>
                     <Text>Date</Text>
-                    <TouchableOpacity onPress={() => setOpenDate(true)}>
-                      <View style={style.textBetween}>
-                        <Text>{moment(date).format('LLLL')}</Text>
-                        <FeatherIcon name="calendar" size={25} color="grey" />
+                    {!openEditDate ? (
+                      <View style={style.editBetween}>
+                        <Text>{moment(detailEvent.date).format('LLLL')}</Text>
+                        <TouchableOpacity onPress={handleOpenEditDate}>
+                          <Text>Edit</Text>
+                        </TouchableOpacity>
                       </View>
-                      <DatePicker
-                        modal
-                        open={openDate}
-                        mode="date"
-                        date={date}
-                        onConfirm={date => {
-                          setOpenDate(false);
-                          setDate(date);
-                        }}
-                        onCancel={() => {
-                          setOpenDate(false);
-                        }}
-                      />
-                    </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity onPress={() => setOpenDate(true)}>
+                        <View style={style.textBetween}>
+                          <Text>{moment(date).format('LLLL')}</Text>
+                          <FeatherIcon name="calendar" size={25} color="grey" />
+                        </View>
+                        <DatePicker
+                          modal
+                          open={openDate}
+                          mode="date"
+                          date={date}
+                          onConfirm={newDate => {
+                            setOpenDate(false);
+                            setDate(newDate);
+                          }}
+                          onCancel={() => {
+                            setOpenDate(false);
+                          }}
+                        />
+                        {/* <DatePicker
+                          modal
+                          open={openDate}
+                          mode="date"
+                          date={date}
+                          onConfirm={date => {
+                            setOpenDate(false);
+                            setDate(date);
+                          }}
+                          onCancel={() => {
+                            setOpenDate(false);
+                          }}
+                        /> */}
+                      </TouchableOpacity>
+                    )}
                   </View>
 
                   <View style={style.formInput}>
                     <Text>Location</Text>
-                    <View>
-                      <DropDownPicker
-                        placeholder="Select Location"
-                        dropDownContainerStyle={style.dropPicker}
-                        textStyle={style.textPicker}
-                        open={openLocation}
-                        value={locationValue}
-                        items={location}
-                        setOpen={setOpenLocation}
-                        setValue={setLocationValue}
-                        setItems={setLocation}
-                        zIndex={1000}
-                        listMode="SCROLLVIEW"
-                      />
-                    </View>
+                    {!openEditLocation ? (
+                      <View style={style.editBetween}>
+                        <Text>{detailEvent.location}</Text>
+                        <TouchableOpacity onPress={handleOpenEditLocation}>
+                          <Text>Edit</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View>
+                        <DropDownPicker
+                          placeholder="Select Location"
+                          dropDownContainerStyle={style.dropPicker}
+                          textStyle={style.textPicker}
+                          open={openLocation}
+                          value={locationValue}
+                          items={location}
+                          setOpen={setOpenLocation}
+                          setValue={setLocationValue}
+                          setItems={setLocation}
+                          zIndex={1000}
+                          listMode="SCROLLVIEW"
+                        />
+                      </View>
+                    )}
                   </View>
 
                   <View style={style.formInput}>
                     <Text>Description</Text>
                     <View>
                       <Input
-                        placeholder="Description"
+                        placeholder={detailEvent.descriptions}
                         onChangeText={handleChange('descriptions')}
                         onBlur={handleBlur('descriptions')}
                         value={values.descriptions}
@@ -286,6 +366,11 @@ const CreateEvent = ({navigation}) => {
 };
 
 const style = StyleSheet.create({
+  editBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
   dropPicker: {
     borderColor: '#EAEAEA',
     borderWidth: 1,
@@ -459,4 +544,4 @@ const style = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
   },
 });
-export default CreateEvent;
+export default UpdateEvent;

@@ -65,6 +65,12 @@ const ManageEvent = ({navigation}) => {
   const handleCreateEvent = () => {
     navigation.navigate('CreateEvent');
   };
+  const handleEventDetail = id => {
+    navigation.navigate('Details', {id});
+  };
+  const handleEventUpdate = id => {
+    navigation.navigate('UpdateEvent', {id});
+  };
   const openModalDelete = eventId => {
     setEventIds(eventId);
     setModalVisible(true);
@@ -112,7 +118,9 @@ const ManageEvent = ({navigation}) => {
                 date={item?.date}
                 day={item?.date}
                 forManageEvent
-                funcEventCreateDelete={() => openModalDelete(item.id)}
+                funcEventDelete={() => openModalDelete(item.id)}
+                funcEventDetail={() => handleEventDetail(item.id)}
+                funcEventUpdate={() => handleEventUpdate(item.id)}
               />
             );
           })}

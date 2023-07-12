@@ -137,7 +137,7 @@ const DetailEvent = ({route, navigation}) => {
         />
         <View style={style.drawerContainer}>
           <View>
-            <TouchableOpacity onPress={() => navigation.replace('HomeMain')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
               <FeatherIcon name="arrow-left" size={35} color="#FFF" />
             </TouchableOpacity>
           </View>
