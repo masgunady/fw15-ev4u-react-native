@@ -5,9 +5,10 @@ import {
   StatusBar,
   ActivityIndicator,
   StyleSheet,
-  ScrollView,
   FlatList,
-  Image,
+  Modal,
+  Pressable,
+  TextInput,
 } from 'react-native';
 import React from 'react';
 import {useSelector} from 'react-redux';
@@ -17,6 +18,7 @@ import {ImageTemplate} from '../../components';
 import {IMGEventDummy} from '../../assets';
 import moment from 'moment';
 import {useFocusEffect} from '@react-navigation/native';
+import FAwesome from 'react-native-vector-icons/FontAwesome';
 
 const SearchResults = ({route, navigation}) => {
   const searctQuery = route.params;
@@ -28,6 +30,8 @@ const SearchResults = ({route, navigation}) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [limitData, setLimitData] = React.useState(5);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [newSearch, setNewSearch] = React.useState('');
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   React.useEffect(() => {
     setSearchItem(searctQuery);
@@ -39,12 +43,6 @@ const SearchResults = ({route, navigation}) => {
         const {data} = await http().get(
           `/event?searchName=${seacrhItem}&page=${currentPage}&limit=${limitData}&sort=${sortEvent}&sortBy=${sortEventBy}`,
         );
-        // setEvent(data.results);
-        // if (data.results.length < limitData) {
-        //   setEvent(data.results);
-        // } else {
-        //   setEvent([...events, ...data.results]);
-        // }
         setEvent([...events, ...data.results]);
       };
       fetchData();
@@ -55,7 +53,15 @@ const SearchResults = ({route, navigation}) => {
   const renderItem = ({item}) => {
     return (
       <View style={style.itemWrapperStyle}>
-        <Image style={style.itemImageStyle} source={{uri: item?.picture}} />
+        <View style={style.photosContent}>
+          <View style={style.photoIcons}>
+            <ImageTemplate
+              src={item?.picture || null}
+              defaultImg={IMGEventDummy}
+              style={style.IMGProfiles}
+            />
+          </View>
+        </View>
         <View style={style.contentWrapperStyle}>
           <Text style={style.txtNameStyle}>{`${item?.title} `}</Text>
           <Text style={style.txtEmailStyle}>
@@ -86,8 +92,25 @@ const SearchResults = ({route, navigation}) => {
     setCurrentPage(currentPage + 1);
   };
 
-  console.log(seacrhItem);
-  console.log(currentPage + 'page');
+  // console.log(seacrhItem);
+  // console.log(currentPage + 'page');
+
+  const handleSortEvent = (sort, sortBy) => {
+    setEvent([]);
+    setCurrentPage(1);
+    setModalVisible(false);
+    setSortEvent(sort);
+    setSortEventBy(sortBy);
+  };
+
+  const handleSearch = qSearch => {
+    setEvent([]);
+    setCurrentPage(1);
+    setSearchItem(qSearch);
+  };
+  const openModalFilter = () => {
+    setModalVisible(true);
+  };
 
   const handlePressEvent = () => {
     navigation.navigate('Home');
@@ -114,35 +137,154 @@ const SearchResults = ({route, navigation}) => {
         <View style={style.contentHeader} />
       </View>
       <View style={style.containerProfile}>
-        <View>
-          {/* <View style={style.profileWrapper}>
-            <View style={style.photosContent}>
-              <View style={style.photoIcons}>
-                <ImageTemplate
-                  src={detailEvent?.picture || null}
-                  defaultImg={IMGEventDummy}
-                  style={style.IMGProfiles}
-                />
-              </View>
-            </View>
-          </View> */}
-          <View style={style.dataProfileWrapper}>
-            <FlatList
-              data={events}
-              renderItem={renderItem}
-              keyExtractor={item => `search-results-${item.id}`}
-              ListFooterComponent={renderLoader}
-              onEndReached={loadMoreItem}
-              onEndReachedThreshold={0}
+        <View style={style.wrapInputFilter}>
+          <View style={style.inputSearch}>
+            <TextInput
+              style={style.textInput}
+              placeholderTextColor="black"
+              placeholder="Search Event..."
+              onChangeText={event => setNewSearch(event)}
+              onSubmitEditing={() => handleSearch(newSearch)}
             />
           </View>
+          <View>
+            <TouchableOpacity onPress={openModalFilter}>
+              <FAwesome name="sliders" size={35} color="#4c3f91" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={style.dataProfileWrapper}>
+          <FlatList
+            data={events}
+            renderItem={renderItem}
+            keyExtractor={item => `search-results-${item.id}`}
+            ListFooterComponent={renderLoader}
+            onEndReached={loadMoreItem}
+            onEndReachedThreshold={0}
+          />
         </View>
       </View>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={style.centeredView}>
+          <View style={style.modalView}>
+            <Text style={style.modalText}>Sort Event By :</Text>
+            <Pressable onPress={() => handleSortEvent('date', 'ASC')}>
+              <Text style={style.textStyleItem}>Latest Event</Text>
+            </Pressable>
+            <Pressable onPress={() => handleSortEvent('title', 'ASC')}>
+              <Text style={style.textStyleItem}>Event Name (A/Z)</Text>
+            </Pressable>
+            <Pressable onPress={() => handleSortEvent('title', 'DESC')}>
+              <Text style={style.textStyleItem}>Event Name (Z/A)</Text>
+            </Pressable>
+            <View style={style.wrapModalBtn}>
+              <Pressable
+                style={[style.button, style.buttonOpen]}
+                onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={style.textStyleNo}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const style = StyleSheet.create({
+  inputSearch: {
+    width: '90%',
+  },
+  wrapInputFilter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  wrapModalBtn: {
+    flexDirection: 'row',
+    gap: 15,
+    marginTop: 10,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: 300,
+  },
+  button: {
+    marginTop: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#b6e5a8',
+  },
+  buttonClose: {
+    backgroundColor: '#ffdcb3',
+  },
+  textStyleItem: {
+    color: '#000',
+    fontWeight: 'bold',
+    height: 30,
+  },
+  textStyleNo: {
+    color: '#49be25',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  textInput: {
+    opacity: 0.8,
+    color: 'black',
+    borderColor: '#4c3f91',
+    fontSize: 17,
+    padding: 15,
+    borderWidth: 1,
+    borderRadius: 15,
+    margin: 20,
+  },
+  photosContent: {
+    width: 100,
+    height: 140,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  photoIcons: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  IMGProfiles: {
+    objectFit: 'cover',
+    width: '100%',
+    height: '100%',
+  },
   contentTextContent: {
     fontFamily: 'Poppins-SemiBold',
     fontSize: 16,
@@ -192,6 +334,7 @@ const style = StyleSheet.create({
     gap: 45,
     paddingHorizontal: 30,
     paddingTop: 20,
+    paddingBottom: 100,
   },
   profileWrapper: {
     justifyContent: 'center',
@@ -200,31 +343,8 @@ const style = StyleSheet.create({
     gap: 10,
   },
   dataProfileWrapper: {
-    marginTop: 20,
     gap: 20,
     marginBottom: 120,
-  },
-  photosContent: {
-    width: '100%',
-    height: 500,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
-    padding: 30,
-  },
-  photoIcons: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'gray',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  IMGProfiles: {
-    objectFit: 'cover',
-    width: '100%',
-    height: '100%',
   },
   formInput: {
     width: '100%',
@@ -259,6 +379,7 @@ const style = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderColor: '#ddd',
+    gap: 20,
   },
   itemImageStyle: {
     width: 100,
@@ -266,7 +387,7 @@ const style = StyleSheet.create({
     marginRight: 16,
   },
   contentWrapperStyle: {
-    justifyContent: 'space-around',
+    justifyContent: 'start',
   },
   txtNameStyle: {
     fontSize: 16,
