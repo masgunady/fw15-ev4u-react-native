@@ -6,6 +6,8 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
+  Modal,
+  Pressable,
 } from 'react-native';
 import React from 'react';
 
@@ -18,6 +20,7 @@ import {useSelector} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {store} from '../../redux/store';
 import {setProfileData} from '../../redux/reducers/profileData';
+
 // import {createNativeStackNavigator} from '@react-navigation/native-stack';
 // import {Booking, DetailEvent, MyBooking, Payment} from '../index';
 
@@ -28,6 +31,10 @@ const Home = () => {
   const [events, setEvent] = React.useState([]);
   const token = useSelector(state => state.auth.token);
   const deviceToken = useSelector(state => state.deviceToken.data);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [sortEvent, setSortEvent] = React.useState('id');
+  const [sortEventBy, setSortEventBy] = React.useState('DESC');
+  const [search, setSearch] = React.useState('');
 
   const saveToken = React.useCallback(async () => {
     const form = new URLSearchParams({token: deviceToken.token});
@@ -36,11 +43,13 @@ const Home = () => {
 
   React.useEffect(() => {
     async function getEvent() {
-      const {data} = await http().get('/event?sort=id&sortBy=desc');
+      const {data} = await http().get(
+        `/event?sort=${sortEvent}&sortBy=${sortEventBy}`,
+      );
       setEvent(data.results);
     }
     getEvent();
-  }, []);
+  }, [sortEvent, sortEventBy]);
 
   React.useEffect(() => {
     async function getProfile() {
@@ -49,6 +58,20 @@ const Home = () => {
     }
     getProfile();
   }, [saveToken, token]);
+
+  const handleSortEvent = (sort, sortBy) => {
+    setModalVisible(false);
+    setSortEvent(sort);
+    setSortEventBy(sortBy);
+  };
+
+  const handleSearch = () => {
+    navigation.navigate('SearchResults', search);
+  };
+
+  const openModalFilter = () => {
+    setModalVisible(true);
+  };
 
   React.useEffect(() => {
     saveToken();
@@ -80,6 +103,8 @@ const Home = () => {
           style={style.textInput}
           placeholderTextColor="white"
           placeholder="Search Event..."
+          onChangeText={event => setSearch(event)}
+          onSubmitEditing={() => handleSearch(search)}
         />
       </View>
       <ScrollView style={style.container} horizontal={false}>
@@ -88,7 +113,9 @@ const Home = () => {
             <Text style={style.containerText}>Events For You</Text>
           </View>
           <View>
-            <FAwesome name="sliders" size={35} color="#4c3f91" />
+            <TouchableOpacity onPress={openModalFilter}>
+              <FAwesome name="sliders" size={35} color="#4c3f91" />
+            </TouchableOpacity>
           </View>
         </View>
         <ScrollView horizontal={true} style={style.wrapperBox}>
@@ -141,10 +168,86 @@ const Home = () => {
           })}
         </View>
       </ScrollView>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={style.centeredView}>
+          <View style={style.modalView}>
+            <Text style={style.modalText}>Sort Event By :</Text>
+            <Pressable onPress={() => handleSortEvent('date', 'ASC')}>
+              <Text style={style.textStyleItem}>Latest Event</Text>
+            </Pressable>
+            <Pressable onPress={() => handleSortEvent('title', 'ASC')}>
+              <Text style={style.textStyleItem}>Event Name (A/Z)</Text>
+            </Pressable>
+            <Pressable onPress={() => handleSortEvent('title', 'DESC')}>
+              <Text style={style.textStyleItem}>Event Name (Z/A)</Text>
+            </Pressable>
+            <View style={style.wrapModalBtn}>
+              <Pressable
+                style={[style.button, style.buttonOpen]}
+                onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={style.textStyleNo}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 const style = StyleSheet.create({
+  wrapModalBtn: {
+    flexDirection: 'row',
+    gap: 15,
+    marginTop: 10,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: 300,
+  },
+  button: {
+    marginTop: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#b6e5a8',
+  },
+  buttonClose: {
+    backgroundColor: '#ffdcb3',
+  },
+  textStyleItem: {
+    color: '#000',
+    fontWeight: 'bold',
+    height: 30,
+  },
+  textStyleNo: {
+    color: '#49be25',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
   drawerContainer: {
     padding: 30,
     flexDirection: 'row',

@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   StyleSheet,
   ScrollView,
+  FlatList,
+  Image,
 } from 'react-native';
 import React from 'react';
 import {useSelector} from 'react-redux';
@@ -14,28 +16,83 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import {ImageTemplate} from '../../components';
 import {IMGEventDummy} from '../../assets';
 import moment from 'moment';
+import {useFocusEffect} from '@react-navigation/native';
 
-const Details = ({route, navigation}) => {
-  const {id} = route.params;
-  const token = useSelector(state => state.auth.token);
-  const [detailEvent, setDetailEvent] = React.useState({});
+const SearchResults = ({route, navigation}) => {
+  const searctQuery = route.params;
+  const [seacrhItem, setSearchItem] = React.useState('');
   const [indicator, setIndicator] = React.useState(false);
+  const [events, setEvent] = React.useState([]);
+  const [sortEvent, setSortEvent] = React.useState('id');
+  const [sortEventBy, setSortEventBy] = React.useState('DESC');
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [limitData, setLimitData] = React.useState(5);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
-    setIndicator(true);
-    const getDetailEvent = async () => {
-      const {data} = await http(token).get(`/event/manage/${id}`);
-      setDetailEvent(data.results);
-      setIndicator(false);
-    };
+    setSearchItem(searctQuery);
+  }, [searctQuery]);
 
-    getDetailEvent();
-  }, [token, id]);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        const {data} = await http().get(
+          `/event?searchName=${seacrhItem}&page=${currentPage}&limit=${limitData}&sort=${sortEvent}&sortBy=${sortEventBy}`,
+        );
+        // setEvent(data.results);
+        // if (data.results.length < limitData) {
+        //   setEvent(data.results);
+        // } else {
+        //   setEvent([...events, ...data.results]);
+        // }
+        setEvent([...events, ...data.results]);
+      };
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPage, sortEvent, seacrhItem, sortEventBy]),
+  );
 
-  console.log(detailEvent);
+  const renderItem = ({item}) => {
+    return (
+      <View style={style.itemWrapperStyle}>
+        <Image style={style.itemImageStyle} source={{uri: item?.picture}} />
+        <View style={style.contentWrapperStyle}>
+          <Text style={style.txtNameStyle}>{`${item?.title} `}</Text>
+          <Text style={style.txtEmailStyle}>
+            Location : {`${item?.location} `}
+          </Text>
+          <Text style={style.txtEmailStyle}>
+            Category : {`${item?.category} `}
+          </Text>
+          <Text style={style.txtEmailStyle}>
+            Date : {moment(item?.date).format('LLLL').slice(0, 3)}
+            {', '}
+            {moment(item?.date).format('LLL')}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderLoader = () => {
+    return isLoading ? (
+      <View style={style.loaderStyle}>
+        <ActivityIndicator size="large" color="#aaa" />
+      </View>
+    ) : null;
+  };
+
+  const loadMoreItem = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  console.log(seacrhItem);
+  console.log(currentPage + 'page');
 
   const handlePressEvent = () => {
-    navigation.navigate('ManageEvent');
+    navigation.navigate('Home');
+    setEvent([]);
+    setCurrentPage(1);
   };
 
   return (
@@ -51,14 +108,14 @@ const Details = ({route, navigation}) => {
           {indicator ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={style.textHeader}>Detail Event</Text>
+            <Text style={style.textHeader}>Search Event</Text>
           )}
         </View>
         <View style={style.contentHeader} />
       </View>
       <View style={style.containerProfile}>
-        <ScrollView>
-          <View style={style.profileWrapper}>
+        <View>
+          {/* <View style={style.profileWrapper}>
             <View style={style.photosContent}>
               <View style={style.photoIcons}>
                 <ImageTemplate
@@ -68,39 +125,18 @@ const Details = ({route, navigation}) => {
                 />
               </View>
             </View>
-          </View>
+          </View> */}
           <View style={style.dataProfileWrapper}>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Event</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>{detailEvent.title}</Text>
-            </View>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Date</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>
-                {' '}
-                {moment(detailEvent.date).format('LLLL').slice(0, 3)}
-                {', '}
-                {moment(detailEvent.date).format('LLL')}
-              </Text>
-            </View>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Location</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>
-                {detailEvent.location}
-              </Text>
-            </View>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Description</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>
-                {detailEvent.descriptions}
-              </Text>
-            </View>
+            <FlatList
+              data={events}
+              renderItem={renderItem}
+              keyExtractor={item => `search-results-${item.id}`}
+              ListFooterComponent={renderLoader}
+              onEndReached={loadMoreItem}
+              onEndReachedThreshold={0}
+            />
           </View>
-        </ScrollView>
+        </View>
       </View>
     </View>
   );
@@ -216,6 +252,35 @@ const style = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Poppins-SemiBold',
   },
+
+  itemWrapperStyle: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  itemImageStyle: {
+    width: 100,
+    height: 140,
+    marginRight: 16,
+  },
+  contentWrapperStyle: {
+    justifyContent: 'space-around',
+  },
+  txtNameStyle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    textTransform: 'capitalize',
+  },
+  txtEmailStyle: {
+    color: '#777',
+    width: 220,
+  },
+  loaderStyle: {
+    marginVertical: 16,
+    alignItems: 'center',
+  },
 });
 
-export default Details;
+export default SearchResults;
