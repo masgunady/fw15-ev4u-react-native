@@ -7,13 +7,14 @@ import {
   StatusBar,
 } from 'react-native';
 import React from 'react';
-import {Button, Input, Checkbox, Alert} from '../../components/elements';
+import {Input, Alert} from '../../components/elements';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {asyncRegister} from '../../redux/actions/auth';
 import {useDispatch, useSelector} from 'react-redux';
 import {clearMessage} from '../../redux/reducers/auth';
+import {Checkbox, Button} from 'react-native-paper';
 
 const validationSchema = Yup.object({
   fullName: Yup.string()
@@ -34,6 +35,7 @@ const Register = ({navigation}) => {
   const dispatch = useDispatch();
   const successMessage = useSelector(state => state.auth.successMessage);
   const errorMessage = useSelector(state => state.auth.errorMessage);
+  const [checked, setChecked] = React.useState(true);
 
   const doRegister = values => {
     dispatch(asyncRegister(values));
@@ -129,11 +131,10 @@ const Register = ({navigation}) => {
             <View style={{marginBottom: 3}} />
             <View style={style.sectionToSignup}>
               <Checkbox
-                disabled={false}
-                value={values.termAndCondition}
-                onValueChange={value =>
-                  setFieldValue('termAndCondition', value)
-                }
+                status={checked ? 'unchecked' : 'checked'}
+                onPress={() => {
+                  setChecked(!checked);
+                }}
               />
               <Text>Accept terms and condition</Text>
             </View>
@@ -141,7 +142,14 @@ const Register = ({navigation}) => {
               <Text style={style.errorsText}>{errors.termAndCondition}</Text>
             )}
             <View style={{marginBottom: 3}} />
-            <Button onPress={handleSubmit} btnTitle="Sign Up" />
+
+            <Button
+              style={style.button}
+              mode="contained"
+              onPress={handleSubmit}
+              disabled={checked}>
+              <Text style={style.textButton}>Sign Up</Text>
+            </Button>
           </View>
         )}
       </Formik>
@@ -150,6 +158,19 @@ const Register = ({navigation}) => {
 };
 
 const style = StyleSheet.create({
+  button: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 55,
+    borderRadius: 15,
+  },
+  textButton: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 16,
+    letterSpacing: 1,
+    color: '#FFF',
+    width: '100%',
+  },
   container: {
     flex: 1,
     paddingTop: 50,

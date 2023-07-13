@@ -67,12 +67,12 @@ const style = StyleSheet.create({
   textContaninerNew: {
     color: 'white',
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     textTransform: 'capitalize',
   },
   textNew: {
     fontSize: 16,
-    fontWeight: 'semibold',
+    fontFamily: 'Poppins-SemiBold',
     color: 'white',
     width: 200,
   },

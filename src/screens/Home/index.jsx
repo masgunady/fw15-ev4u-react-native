@@ -236,12 +236,12 @@ const style = StyleSheet.create({
   },
   textStyleItem: {
     color: '#000',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     height: 30,
   },
   textStyleNo: {
     color: '#49be25',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     textAlign: 'center',
   },
   modalText: {
@@ -269,7 +269,7 @@ const style = StyleSheet.create({
   textColor: {
     color: 'white',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   textInput: {
     opacity: 0.8,
@@ -283,7 +283,7 @@ const style = StyleSheet.create({
   },
   containerText: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     color: 'black',
     padding: 30,
   },
@@ -300,7 +300,7 @@ const style = StyleSheet.create({
   textContaninerNew: {
     color: 'white',
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   wrapTitle: {
     flexDirection: 'row',
@@ -310,7 +310,7 @@ const style = StyleSheet.create({
   },
   textNew: {
     fontSize: 16,
-    fontWeight: 'semibold',
+    fontFamily: 'Poppins-SemiBold',
     color: 'white',
   },
   warapperDate: {
@@ -364,7 +364,7 @@ const style = StyleSheet.create({
   },
   containerTextUpcoming: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     color: 'black',
   },
   containerUpcoming: {
@@ -380,7 +380,7 @@ const style = StyleSheet.create({
 
   monthText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     color: '#FF3D72',
   },
   monthTextCont: {
@@ -401,7 +401,7 @@ const style = StyleSheet.create({
   },
   textButton: {
     color: 'blue',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   contentUpcoming: {
     justifyContent: 'center',

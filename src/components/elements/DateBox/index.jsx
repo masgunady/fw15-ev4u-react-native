@@ -31,7 +31,7 @@ const style = StyleSheet.create({
   },
   textDay: {
     color: '#FF8900',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 16,
   },
 });

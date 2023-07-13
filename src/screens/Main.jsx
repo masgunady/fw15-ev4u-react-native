@@ -83,7 +83,7 @@ function CustomDrawerContent(props) {
 
 const style = StyleSheet.create({
   containerProfile: {
-    paddingTop: 40,
+    paddingVertical: 40,
     paddingHorizontal: 20,
     flexDirection: 'row',
     gap: 10,
