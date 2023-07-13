@@ -15,27 +15,35 @@ import {ImageTemplate} from '../../components';
 import {IMGEventDummy} from '../../assets';
 import moment from 'moment';
 
-const Details = ({route, navigation}) => {
-  const {id} = route.params;
-  const token = useSelector(state => state.auth.token);
-  const [detailEvent, setDetailEvent] = React.useState({});
+const SearchResults = ({route, navigation}) => {
+  const searctQuery = route.params;
+  const [seacrhItem, setSearchItem] = React.useState('');
   const [indicator, setIndicator] = React.useState(false);
+  const [events, setEvent] = React.useState([]);
+  const [sortEvent, setSortEvent] = React.useState('id');
+  const [sortEventBy, setSortEventBy] = React.useState('DESC');
+  React.useEffect(() => {
+    setSearchItem(searctQuery);
+  }, [searctQuery]);
 
   React.useEffect(() => {
     setIndicator(true);
-    const getDetailEvent = async () => {
-      const {data} = await http(token).get(`/event/manage/${id}`);
-      setDetailEvent(data.results);
-      setIndicator(false);
-    };
+    async function getEvent() {
+      const {data} = await http().get(
+        `/event?searchName=${seacrhItem}&sort=${sortEvent}&sortBy=${sortEventBy}`,
+      );
+      setEvent(data.results);
+    }
+    getEvent();
+    setIndicator(false);
+  }, [sortEvent, sortEventBy, seacrhItem]);
 
-    getDetailEvent();
-  }, [token, id]);
-
-  console.log(detailEvent);
+  console.log(seacrhItem);
+  console.log(events);
 
   const handlePressEvent = () => {
-    navigation.navigate('ManageEvent');
+    navigation.navigate('Home');
+    setSearchItem('');
   };
 
   return (
@@ -51,14 +59,14 @@ const Details = ({route, navigation}) => {
           {indicator ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={style.textHeader}>Detail Event</Text>
+            <Text style={style.textHeader}>Search Event</Text>
           )}
         </View>
         <View style={style.contentHeader} />
       </View>
       <View style={style.containerProfile}>
         <ScrollView>
-          <View style={style.profileWrapper}>
+          {/* <View style={style.profileWrapper}>
             <View style={style.photosContent}>
               <View style={style.photoIcons}>
                 <ImageTemplate
@@ -68,37 +76,9 @@ const Details = ({route, navigation}) => {
                 />
               </View>
             </View>
-          </View>
+          </View> */}
           <View style={style.dataProfileWrapper}>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Event</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>{detailEvent.title}</Text>
-            </View>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Date</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>
-                {' '}
-                {moment(detailEvent.date).format('LLLL').slice(0, 3)}
-                {', '}
-                {moment(detailEvent.date).format('LLL')}
-              </Text>
-            </View>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Location</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>
-                {detailEvent.location}
-              </Text>
-            </View>
-            <View style={style.contentWrap}>
-              <Text style={style.contentTextTitle}>Description</Text>
-              <Text style={style.contentText}>:</Text>
-              <Text style={style.contentTextContent}>
-                {detailEvent.descriptions}
-              </Text>
-            </View>
+            <Text>Test</Text>
           </View>
         </ScrollView>
       </View>
@@ -218,4 +198,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default Details;
+export default SearchResults;

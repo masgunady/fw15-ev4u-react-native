@@ -8,7 +8,6 @@ import {
   StatusBar,
   Modal,
   Pressable,
-  Alert,
 } from 'react-native';
 import React from 'react';
 
@@ -35,6 +34,7 @@ const Home = () => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [sortEvent, setSortEvent] = React.useState('id');
   const [sortEventBy, setSortEventBy] = React.useState('DESC');
+  const [search, setSearch] = React.useState('');
 
   const saveToken = React.useCallback(async () => {
     const form = new URLSearchParams({token: deviceToken.token});
@@ -63,6 +63,10 @@ const Home = () => {
     setModalVisible(false);
     setSortEvent(sort);
     setSortEventBy(sortBy);
+  };
+
+  const handleSearch = () => {
+    navigation.navigate('SearchResults', search);
   };
 
   const openModalFilter = () => {
@@ -99,6 +103,8 @@ const Home = () => {
           style={style.textInput}
           placeholderTextColor="white"
           placeholder="Search Event..."
+          onChangeText={event => setSearch(event)}
+          onSubmitEditing={() => handleSearch(search)}
         />
       </View>
       <ScrollView style={style.container} horizontal={false}>

@@ -40,6 +40,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import {ImageTemplate} from '../components';
 import {IMGProfile} from '../assets';
 import UpdateEvent from './ManageEvent/UpdateEvent';
+import SearchResults from './SearchResults';
 
 function CustomDrawerContent(props) {
   const dispatch = useDispatch();
@@ -233,6 +234,11 @@ function MyDrawer() {
       <Drawer.Screen
         name="UpdateEvent"
         component={UpdateEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+      <Drawer.Screen
+        name="SearchResults"
+        component={SearchResults}
         options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
     </Drawer.Navigator>
