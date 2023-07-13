@@ -198,12 +198,12 @@ const style = StyleSheet.create({
   },
   textStyleYes: {
     color: '#FF8900',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     textAlign: 'center',
   },
   textStyleNo: {
     color: '#49be25',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     textAlign: 'center',
   },
   modalText: {

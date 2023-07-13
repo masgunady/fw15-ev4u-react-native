@@ -11,7 +11,6 @@ import {
   TextInput,
 } from 'react-native';
 import React from 'react';
-import {useSelector} from 'react-redux';
 import http from '../../helpers/http';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {ImageTemplate} from '../../components';
@@ -63,7 +62,9 @@ const SearchResults = ({route, navigation}) => {
           </View>
         </View>
         <View style={style.contentWrapperStyle}>
-          <Text style={style.txtNameStyle}>{`${item?.title} `}</Text>
+          <TouchableOpacity onPress={() => handlePressEventDetail(item?.id)}>
+            <Text style={style.txtNameStyle}>{`${item?.title} `}</Text>
+          </TouchableOpacity>
           <Text style={style.txtEmailStyle}>
             Location : {`${item?.location} `}
           </Text>
@@ -92,9 +93,6 @@ const SearchResults = ({route, navigation}) => {
     setCurrentPage(currentPage + 1);
   };
 
-  // console.log(seacrhItem);
-  // console.log(currentPage + 'page');
-
   const handleSortEvent = (sort, sortBy) => {
     setEvent([]);
     setCurrentPage(1);
@@ -114,6 +112,11 @@ const SearchResults = ({route, navigation}) => {
 
   const handlePressEvent = () => {
     navigation.navigate('Home');
+    setEvent([]);
+    setCurrentPage(1);
+  };
+  const handlePressEventDetail = id => {
+    navigation.navigate('DetailEvent', {id});
     setEvent([]);
     setCurrentPage(1);
   };
@@ -242,12 +245,12 @@ const style = StyleSheet.create({
   },
   textStyleItem: {
     color: '#000',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     height: 30,
   },
   textStyleNo: {
     color: '#49be25',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
     textAlign: 'center',
   },
   modalText: {
