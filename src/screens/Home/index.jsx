@@ -16,10 +16,10 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {EventBox, CategoryBox, DateBox} from '../../components';
 import http from '../../helpers/http';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
-import {store} from '../../redux/store';
 import {setProfileData} from '../../redux/reducers/profileData';
+import {setEvent} from '../../redux/reducers/event';
 
 // import {createNativeStackNavigator} from '@react-navigation/native-stack';
 // import {Booking, DetailEvent, MyBooking, Payment} from '../index';
@@ -27,8 +27,10 @@ import {setProfileData} from '../../redux/reducers/profileData';
 // const Stack = createNativeStackNavigator();
 
 const Home = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [events, setEvent] = React.useState([]);
+  const events = useSelector(state => state.event.event);
+  // const [events, setEvent] = React.useState([]);
   const token = useSelector(state => state.auth.token);
   const deviceToken = useSelector(state => state.deviceToken.data);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -46,18 +48,19 @@ const Home = () => {
       const {data} = await http().get(
         `/event?sort=${sortEvent}&sortBy=${sortEventBy}`,
       );
-      setEvent(data.results);
+      // setEvent(data.results);
+      dispatch(setEvent(data.results));
     }
     getEvent();
-  }, [sortEvent, sortEventBy]);
+  }, [sortEvent, sortEventBy, token, dispatch]);
 
   React.useEffect(() => {
     async function getProfile() {
       const {data} = await http(token).get('/profile');
-      store.dispatch(setProfileData(data.results));
+      dispatch(setProfileData(data.results));
     }
     getProfile();
-  }, [saveToken, token]);
+  }, [saveToken, token, dispatch]);
 
   const handleSortEvent = (sort, sortBy) => {
     setModalVisible(false);

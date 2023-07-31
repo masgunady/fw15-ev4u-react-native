@@ -77,15 +77,15 @@ const MyWishlist = ({navigation}) => {
           {myWishlist.map(item => {
             return (
               <EventList
-                key={`wishlist-manage-${item.wishlistId}`}
+                key={`wishlist-manage-${item?.wishlistId}`}
                 dateBoxDate={item?.date}
                 dateBoxDay={item?.date}
-                eventSpecId={item.eventId}
-                title={item.title}
-                location={item.location}
+                eventSpecId={item?.eventId}
+                title={item?.title}
+                location={item?.location}
                 date={item?.date}
                 day={item?.date}
-                addRemoveWishlist={() => addRemoveWishlist(`${item.eventId}`)}
+                addRemoveWishlist={() => addRemoveWishlist(`${item?.eventId}`)}
                 forWishlist
               />
             );

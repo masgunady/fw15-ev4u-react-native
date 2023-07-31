@@ -6,6 +6,7 @@ import deviceToken from './deviceToken';
 import eventId from './eventId';
 import transaction from './transaction';
 import profileData from './profileData';
+import event from './event';
 
 const authConfig = {
   key: 'auth',
@@ -18,6 +19,7 @@ const reducer = combineReducers({
   eventId,
   transaction,
   profileData,
+  event,
 });
 
 export default reducer;

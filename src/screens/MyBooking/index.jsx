@@ -41,16 +41,6 @@ const MyBooking = ({navigation}) => {
     }, 1000);
   }, [token]);
 
-  // React.useEffect(() => {
-  //   async function getEventByMe() {
-  //     const {data} = await http(token).get('/history');
-  //     setReservationByMe(data.results);
-  //   }
-  //   if (token) {
-  //     getEventByMe();
-  //   }
-  // }, [token, setReservationByMe]);
-
   const handlePressEvent = () => {
     navigation.navigate('Home');
   };
@@ -87,17 +77,17 @@ const MyBooking = ({navigation}) => {
           {reservationByMe.map(item => {
             return (
               <EventList
-                key={`booiking-manage-${item.id}`}
+                key={`booiking-manage-${item?.id}`}
                 dateBoxDate={item?.reservationDate}
                 dateBoxDay={item?.reservationDate}
-                eventSpecId={item.eventId}
-                title={item.title}
-                location={item.location}
+                eventSpecId={item?.eventId}
+                title={item?.title}
+                location={item?.location}
                 date={item?.date}
                 day={item?.date}
                 paymentMethod={item?.paymentMethod}
                 forMyBooking
-                transactionDetail={() => handlePressDetail(item.id)}
+                transactionDetail={() => handlePressDetail(item?.id)}
               />
             );
           })}

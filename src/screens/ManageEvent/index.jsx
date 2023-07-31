@@ -109,18 +109,18 @@ const ManageEvent = ({navigation}) => {
           {eventByMe.map(item => {
             return (
               <EventList
-                key={`booiking-manage-${item.id}`}
+                key={`booiking-manage-${item?.id}`}
                 dateBoxDate={item?.date}
                 dateBoxDay={item?.date}
-                eventSpecId={item.eventId}
-                title={item.title}
-                location={item.location}
+                eventSpecId={item?.eventId}
+                title={item?.title}
+                location={item?.location}
                 date={item?.date}
                 day={item?.date}
                 forManageEvent
-                funcEventDelete={() => openModalDelete(item.id)}
-                funcEventDetail={() => handleEventDetail(item.id)}
-                funcEventUpdate={() => handleEventUpdate(item.id)}
+                funcEventDelete={() => openModalDelete(item?.id)}
+                funcEventDetail={() => handleEventDetail(item?.id)}
+                funcEventUpdate={() => handleEventUpdate(item?.id)}
               />
             );
           })}

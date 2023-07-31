@@ -7,16 +7,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import React from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import http from '../../helpers/http';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import moment from 'moment';
-import {store} from '../../redux/store';
 import {setTransactionData} from '../../redux/reducers/transaction';
 import {useFocusEffect} from '@react-navigation/native';
 
 const DetailTransaction = ({route, navigation}) => {
   const {id} = route.params;
+  const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
   const [detailTransaction, setDetailTransaction] = React.useState({});
 
@@ -42,7 +42,7 @@ const DetailTransaction = ({route, navigation}) => {
     totalPayment: detailTransaction?.totalPrice,
   };
   const handlePressPayment = () => {
-    store.dispatch(setTransactionData(dataBooking));
+    dispatch(setTransactionData(dataBooking));
     navigation.navigate('Payment');
   };
   return (

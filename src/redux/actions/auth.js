@@ -8,7 +8,6 @@ export const asyncLogin = createAsyncThunk(
       const form = new URLSearchParams();
       form.append('email', payload.email);
       form.append('password', payload.password);
-
       const {data} = await http().post('/auth/login', form.toString());
       return data.results.token;
     } catch (err) {

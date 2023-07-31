@@ -11,14 +11,13 @@ import React from 'react';
 import {IMGSection} from '../../assets';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import http from '../../helpers/http';
-import {store} from '../../redux/store';
 import {setTransactionData} from '../../redux/reducers/transaction';
 // import {clearEventId} from '../../redux/reducers/eventId';
 
 const Booking = ({navigation}) => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const token = useSelector(state => state.auth.token);
   const eventId = useSelector(state => state.eventId.eventId);
@@ -68,7 +67,7 @@ const Booking = ({navigation}) => {
       totalPayment: data.results.totalPrice,
     };
 
-    store.dispatch(setTransactionData(dataBooking));
+    dispatch(setTransactionData(dataBooking));
     navigation.navigate('Payment');
     // dispatch(clearEventId());
   };

@@ -14,14 +14,14 @@ import {LinearGradient} from 'rnx-gradient';
 import moment from 'moment';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useFocusEffect} from '@react-navigation/native';
 import {setEventId} from '../../redux/reducers/eventId';
-import {store} from '../../redux/store';
 
 const DetailEvent = ({route, navigation}) => {
   const {id} = route.params;
+  const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
   const [eventDetail, setEventDetail] = React.useState({});
   const [wishlistButton, setWishlistButton] = React.useState(false);
@@ -74,7 +74,7 @@ const DetailEvent = ({route, navigation}) => {
 
   const handlePressEvent = eventId => {
     navigation.navigate('Booking', {eventId});
-    store.dispatch(setEventId(eventId));
+    dispatch(setEventId(eventId));
   };
 
   // React.useEffect(() => {
